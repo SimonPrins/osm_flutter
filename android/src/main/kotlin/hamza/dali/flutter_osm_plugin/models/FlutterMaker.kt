@@ -82,6 +82,7 @@ open class FlutterMarker(private var mapView: MapView, var scope: CoroutineScope
 
     private fun initInfoWindow() {
         createWindowInfoView()
+        this.setAnchor(0.5f, 0.5f)
         mInfoWindow = FlutterInfoWindow(
             infoView = infoWindow!!,
             mapView = mapView,
