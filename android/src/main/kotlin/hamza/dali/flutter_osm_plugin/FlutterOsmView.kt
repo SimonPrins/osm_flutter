@@ -318,7 +318,7 @@ class FlutterOsmView(
         mainLinearLayout.addView(map)
         /// init LocationManager
         locationNewOverlay = CustomLocationManager(map!!)
-
+        map!!.getTileProvider().clearTileCache();
     }
 
 
