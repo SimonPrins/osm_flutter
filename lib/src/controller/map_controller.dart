@@ -471,6 +471,36 @@ class MapController extends BaseMapController {
     );
   }
 
+  /// Used to obtain a reusable icon marker key so that multiple markers with the same icon can be added more efficiently
+  ///
+  /// [markerIcon] : (MarkerIcon) set icon of the marker
+  ///
+  /// [angle]: (double) the angle at which the marker will be drawn
+  Future<GlobalKey> getIconMarkerKey(
+      MarkerIcon markerIcon,
+        {double? angle}) async {
+    if (angle != null) {
+      assert(angle >= -pi && angle <= pi, "angle should be between -pi and pi");
+    }
+    return await osmBaseController.getIconMarkerKey(
+      markerIcon,
+      angle: angle,
+    );
+  }
+
+  /// create marker int specific position without change map camera
+  ///
+  /// [p] : (GeoPoint) desired location
+  ///
+  /// [iconKey] : (GlobalKey) The GlobalKey of an icon obtained with the getIconMarkerKey() function
+  Future<void> addMarkerByKey(
+      GeoPoint p,
+      GlobalKey iconKey) async {
+    await osmBaseController.addMarkerByKey(
+      p,
+      iconKey: iconKey,
+    );
+  }
   Future<void> addMarker(
     GeoPoint p, {
     MarkerIcon? markerIcon,
