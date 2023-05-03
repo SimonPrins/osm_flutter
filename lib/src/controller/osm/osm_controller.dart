@@ -442,6 +442,44 @@ class MobileOSMController extends IBaseOSMController {
     await osmPlatform.goToPosition(_idMap, p);
   }
 
+  /// Used to obtain a reusable icon marker key so that multiple markers with the same icon can be added more efficiently
+  ///
+  /// [markerIcon] : (MarkerIcon) set icon of the marker
+  ///
+  /// [angle]: (double) the angle at which the marker will be drawn
+  Future<GlobalKey> getIconMarkerKey(
+      MarkerIcon markerIcon,
+      double? angle
+      ) async {
+    _osmFlutterState.widget.dynamicMarkerWidgetNotifier.value =
+    ((angle == null) || (angle == 0.0))
+        ? markerIcon
+        : Transform.rotate(
+      angle: angle,
+      child: markerIcon,
+    );
+    int duration = 1000;
+    return Future.delayed(Duration(milliseconds: duration), () async {
+      return _osmFlutterState.dynamicMarkerKey;
+    });
+  }
+
+  /// create marker int specific position without change map camera
+  ///
+  /// [p] : (GeoPoint) desired location
+  ///
+  /// [iconKey] : (GlobalKey) The GlobalKey of an icon obtained with the getIconMarkerKey() function
+  Future<void> addMarkerByKey(
+      GeoPoint p,
+      GlobalKey iconKey
+      ) async {
+    await osmPlatform.addMarker(
+      _idMap,
+      p,
+      globalKeyIcon: iconKey,
+    );
+  }
+
   /// create marker int specific position without change map camera
   ///
   /// [p] : (GeoPoint) desired location
