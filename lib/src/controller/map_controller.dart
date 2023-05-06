@@ -485,7 +485,7 @@ class MapController extends BaseMapController {
     }
     return await osmBaseController.getIconMarkerKey(
       markerIcon,
-      angle: angle,
+      angle,
     );
   }
 
@@ -499,7 +499,7 @@ class MapController extends BaseMapController {
       GlobalKey iconKey) async {
     await osmBaseController.addMarkerByKey(
       p,
-      iconKey: iconKey,
+      iconKey,
     );
   }
   Future<void> addMarker(
