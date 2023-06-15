@@ -1113,7 +1113,7 @@ class FlutterOsmView(
         val args = call.arguments!! as HashMap<String, *>
         val geoPoint = GeoPoint(args["lat"]!! as Double, args["lon"]!! as Double)
         //map!!.controller.zoomTo(defaultZoom)
-        map!!.controller.animateTo(geoPoint)
+        map!!.controller.animateTo(geoPoint, 18.0, 1000, 90.0f)
         result.success(null)
     }
 
