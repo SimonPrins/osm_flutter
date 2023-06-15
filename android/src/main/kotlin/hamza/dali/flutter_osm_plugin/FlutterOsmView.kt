@@ -302,12 +302,12 @@ class FlutterOsmView(
         map!!.minZoomLevel = 2.0
         when (mapSnapShots.containsKey(keyMapSnapshot)) {
             true -> {
-                map!!.setExpectedCenter(mapSnapShot().centerGeoPoint())
-                map!!.controller.setZoom(mapSnapShot().zoomLevel(2.0))
+                map!!.setExpectedCenter(mapSnapShot().centerGeoPoint()?: GeoPoint(52.175, 5.325))
+                map!!.controller.setZoom(mapSnapShot().zoomLevel(8.0))
             }
             else -> {
-                map!!.setExpectedCenter(GeoPoint(0.0, 0.0))
-                map!!.controller.setZoom(2.0)
+                map!!.setExpectedCenter(GeoPoint(52.175, 5.325))
+                map!!.controller.setZoom(8.0)
             }
         }
 
@@ -1591,7 +1591,7 @@ class FlutterOsmView(
         val roadWidth = (args["roadWidth"] as Double).toFloat()
         val roadBorderWidth = (args["roadBorderWidth"] as Double).toFloat()
         val roadBorderColor = (args["roadBorderColor"] as List<Int>).toRGB()
-        val zoomToRegion = args["zoomInto"] as Boolean
+        val zoomToRegion = args["zoomIntoRegion"] as Boolean
 
         checkRoadFolderAboveUserOverlay()
 

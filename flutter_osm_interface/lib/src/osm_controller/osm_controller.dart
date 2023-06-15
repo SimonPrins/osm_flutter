@@ -27,6 +27,26 @@ abstract class IBaseOSMController {
   /// [p] : (GeoPoint) position that will be added to map
   Future<void> changeLocation(GeoPoint p);
 
+  /// Used to obtain a reusable icon marker key so that multiple markers with the same icon can be added more efficiently
+  ///
+  /// [markerIcon] : (MarkerIcon) set icon of the marker
+  ///
+  /// [angle]: (double) the angle at which the marker will be drawn
+  Future<GlobalKey> getIconMarkerKey(
+      MarkerIcon markerIcon,
+      double? angle
+  );
+
+  /// create marker int specific position without change map camera
+  ///
+  /// [p] : (GeoPoint) desired location
+  ///
+  /// [iconKey] : (GlobalKey) The GlobalKey of an icon obtained with the getIconMarkerKey() function
+  Future<void> addMarkerByKey(
+      GeoPoint p,
+      GlobalKey iconKey
+  );
+
   /// addMarker
   /// create marker int specific position without
   /// change map camera
