@@ -153,8 +153,8 @@ class MapController extends BaseMapController {
   ///animate  to specific position with out add marker into the map
   ///
   /// [p] : (GeoPoint) position that will be go to map
-  Future<void> goToLocation(GeoPoint p) async {
-    await osmBaseController.goToPosition(p);
+  Future<void> goToLocation(GeoPoint p, {double? zoom = null}) async {
+    await osmBaseController.goToPosition(p, zoom: zoom);
   }
 
   /// [removeMarker]

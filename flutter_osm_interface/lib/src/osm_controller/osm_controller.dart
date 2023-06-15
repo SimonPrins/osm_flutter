@@ -138,7 +138,7 @@ abstract class IBaseOSMController {
   /// to another specific position without create marker
   /// has attribute which is the desired location
   /// [p] : (GeoPoint) desired location
-  Future<void> goToPosition(GeoPoint p);
+  Future<void> goToPosition(GeoPoint p, {double? zoom = null, double? orientation = null});
 
   /// enabled tracking user location
   Future<void> enableTracking({bool enableStopFollow = false});
