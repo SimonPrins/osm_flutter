@@ -18,7 +18,7 @@ dependencies:
   flutter_osm_interface:
     git:
       url: https://github.com/SimonPrins/osm_flutter.git
-      ref: bromplanner
+      ref: test-one-call-to-move
       path: flutter_osm_interface
 dev_dependencies:
   flutter_test:
