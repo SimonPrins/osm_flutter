@@ -438,8 +438,8 @@ class MobileOSMController extends IBaseOSMController {
   /// go to specific position without create marker
   ///
   /// [p] : (GeoPoint) desired location
-  Future<void> goToPosition(GeoPoint p) async {
-    await osmPlatform.goToPosition(_idMap, p);
+  Future<void> goToPosition(GeoPoint p, {double? zoom = null, double? orientation = null}) async {
+    await osmPlatform.goToPosition(_idMap, p, zoom: zoom, orientation: orientation);
   }
 
   /// Used to obtain a reusable icon marker key so that multiple markers with the same icon can be added more efficiently
