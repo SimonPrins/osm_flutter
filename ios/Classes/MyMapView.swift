@@ -466,7 +466,7 @@ public class MyMapView: NSObject, FlutterPlatformView, CLLocationManagerDelegate
         }
         var bearing = mapView.bearing
         if (args.keys.contains("orientation")) {
-            bearing = CGFloat(args["orientation"])
+            bearing = CGFloat(args["orientation"] as! Double)
         }
         let point = call.arguments as! GeoPoint
         mapView.fly(to: TGCameraPosition(center: point.toLocationCoordinate(), zoom: zoomLevel, bearing: bearing, pitch: 0),
