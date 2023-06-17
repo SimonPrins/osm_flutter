@@ -460,11 +460,11 @@ public class MyMapView: NSObject, FlutterPlatformView, CLLocationManagerDelegate
 
     private func goToSpecificLocation(call: FlutterMethodCall, result: FlutterResult) {
         let args = call.arguments as! [String: Any]
-        let zoomLevel = mapView.zoom
+        var zoomLevel = mapView.zoom
         if (args.keys.contains("zoomLevel")) {
             zoomLevel = args["zoomLevel"] as! Double
         }
-		let bearing = mapView.bearing
+        var bearing = mapView.bearing
         if (args.keys.contains("orientation")) {
             bearing = CGFloat(args["orientation"])
         }
