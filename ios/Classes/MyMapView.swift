@@ -459,8 +459,17 @@ public class MyMapView: NSObject, FlutterPlatformView, CLLocationManagerDelegate
     }
 
     private func goToSpecificLocation(call: FlutterMethodCall, result: FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let zoomLevel = mapView.zoom
+        if (args.keys.contains("zoomLevel")) {
+            zoomLevel = args["zoomLevel"] as! Double
+        }
+		let bearing = mapView.bearing
+        if (args.keys.contains("orientation")) {
+            bearing = CGFloat(args["orientation"])
+        }
         let point = call.arguments as! GeoPoint
-        mapView.fly(to: TGCameraPosition(center: point.toLocationCoordinate(), zoom: 19, bearing: 90, pitch: 0),
+        mapView.fly(to: TGCameraPosition(center: point.toLocationCoordinate(), zoom: zoomLevel, bearing: bearing, pitch: 0),
                 withDuration: 0.2)
         result(200)
     }
