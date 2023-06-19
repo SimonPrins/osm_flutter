@@ -1113,9 +1113,9 @@ class FlutterOsmView(
         val args = call.arguments!! as HashMap<String, *>
         val geoPoint = GeoPoint(args["lat"]!! as Double, args["lon"]!! as Double)
         val zoomLevel  = if (args.containsKey("zoomLevel")) args["zoomLevel"] as Double else null
-        val orientation = if (args.containsKey("orientation")) (args["orientation"] as Double).toFloat() else null
+        val orientation = if (args.containsKey("orientation")) (360 - (args["orientation"] as Double).toFloat()) else null
         //map!!.controller.zoomTo(defaultZoom)
-        map!!.controller.animateTo(geoPoint, zoomLevel, 1000, 360 - orientation)
+        map!!.controller.animateTo(geoPoint, zoomLevel, 1000, orientation)
         result.success(null)
     }
 
