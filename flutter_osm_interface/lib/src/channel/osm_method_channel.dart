@@ -460,8 +460,14 @@ class MethodChannelOSM extends MobileOSMPlatform {
   }
 
   @override
-  Future<void> goToPosition(int idOSM, GeoPoint p) async {
-    Map requestData = {"lon": p.longitude, "lat": p.latitude};
+  Future<void> goToPosition(int idOSM, GeoPoint p, {double? zoom = null, double? orientation}) async {
+    Map requestData = {"lon": p.longitude, "lat": p.latitude };
+    if (zoom != null) {
+      requestData["zoomLevel"] = zoom!;
+    }
+    if (orientation != null) {
+      requestData["orientation"] = orientation!;
+    }
     await _channels[idOSM]?.invokeMethod(
       "goto#position",
       requestData,

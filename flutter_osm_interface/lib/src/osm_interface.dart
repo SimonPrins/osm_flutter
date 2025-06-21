@@ -98,6 +98,7 @@ abstract class MobileOSMPlatform extends OSMPlatform {
   Future<void> goToPosition(
     int idOSM,
     GeoPoint p,
+    {double? zoom = null, double? orientation = null}
   );
 
   Future<void> addMarker(
