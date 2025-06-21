@@ -2,7 +2,7 @@ group 'hamza.dali.flutter_osm_plugin'
 version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.7.20'
+    ext.kotlin_version = '1.9.24'
     repositories {
         google()
         mavenCentral()
@@ -25,44 +25,58 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+//apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 32
+    compileSdk 35
+    namespace "hamza.dali.flutter_osm_plugin"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
-        disable 'InvalidPackage'
+       // disable 'InvalidPackage'
     }
     buildFeatures {
         viewBinding  true
     }
+    compileOptions {
+        //coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17
+    }
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
 }
 dependencies {
 
-    def coroutines_version ="1.6.1"
+    def coroutines_version ="1.10.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
-    //implementation 'androidx.core:core-ktx:1.9.0'
-    //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
     // Retrofit and relevant converters
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.11.0'
     //picasso
-    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.squareup.picasso3:picasso:3.0.0-alpha06'
 
 
     //Preference
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
 
 
     // Coroutines
@@ -70,8 +84,12 @@ dependencies {
     //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
-    implementation 'org.osmdroid:osmdroid-android:6.1.13'
+    implementation 'org.osmdroid:osmdroid-android:6.1.20'
     implementation 'com.github.MKergall:osmbonuspack:6.9.0'
-    implementation 'com.google.android.material:material:1.7.0'
-}
+    implementation 'com.google.android.material:material:1.12.0'
 
+    //coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
+
+    //implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'
+
+}
