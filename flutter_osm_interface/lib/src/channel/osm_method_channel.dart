@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:typed_data' show ByteData;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,7 @@ import '../common/road_exception.dart';
 import '../common/utilities.dart';
 import '../osm_interface.dart';
 import '../types/types.dart';
+
 
 class MethodChannelOSM extends MobileOSMPlatform {
   final Map<int, MethodChannel> _channels = {};
@@ -331,13 +333,12 @@ class MethodChannelOSM extends MobileOSMPlatform {
       print(e.message);
     }
   }
-
   Future<dynamic> _capturePng(GlobalKey globalKey) async {
     if (globalKey.currentContext == null) {
       throw Exception("Error to draw you custom icon");
     }
     RenderRepaintBoundary boundary =
-        globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
     ui.Image image;
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -348,17 +349,28 @@ class MethodChannelOSM extends MobileOSMPlatform {
     }
 
     ByteData byteData =
-        (await (image.toByteData(format: ui.ImageByteFormat.png)))!;
+    (await (image.toByteData(format: ui.ImageByteFormat.png)))!;
     Uint8List pngBytes = byteData.buffer.asUint8List();
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return {
         "icon": pngBytes.convertToString(),
         "size": globalKey.currentContext != null
             ? [
-                globalKey.currentContext!.size!.width.toInt(),
-                globalKey.currentContext!.size!.height.toInt()
-              ]
+          globalKey.currentContext!.size!.width.toInt(),
+          globalKey.currentContext!.size!.height.toInt()
+        ]
             : iosSizeIcon
+      };
+    }
+    return pngBytes;
+  }
+
+  dynamic _capturePngFromBytes(ByteData byteData) {
+    Uint8List pngBytes = byteData.buffer.asUint8List();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return {
+        "icon": pngBytes.convertToString(),
+        "size": iosSizeIcon
       };
     }
     return pngBytes;
@@ -560,6 +572,16 @@ class MethodChannelOSM extends MobileOSMPlatform {
       args["icon"] = icon;
     }
 
+    await _channels[idOSM]?.invokeMethod("add#Marker", args);
+  }
+
+  @override
+  Future<void> addMarkerByImageBytes(
+      int idOSM,
+      GeoPoint p,
+      ByteData byteData) async {
+    Map<String, dynamic> args = {"point": p.toMap()};
+    args["icon"] = _capturePngFromBytes(byteData);
     await _channels[idOSM]?.invokeMethod("add#Marker", args);
   }
 
