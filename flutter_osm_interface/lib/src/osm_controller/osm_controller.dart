@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../types/types.dart';
+import 'dart:typed_data' show ByteData;
 
 abstract class IBaseOSMController {
   Future<void> initPositionMap({
@@ -46,6 +47,16 @@ abstract class IBaseOSMController {
       GeoPoint p,
       GlobalKey iconKey
   );
+
+  /// create marker int specific position without change map camera
+  ///
+  /// [p] : (GeoPoint) desired location
+  ///
+  /// [iconKey] : (GlobalKey) The GlobalKey of an icon obtained with the getIconMarkerKey() function
+  Future<void> addMarkerByImageBytes(
+      GeoPoint p,
+      ByteData byteData
+      );
 
   /// addMarker
   /// create marker int specific position without

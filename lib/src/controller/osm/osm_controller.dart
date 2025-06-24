@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_interface/flutter_osm_interface.dart';
 
+import 'dart:typed_data' show ByteData;
 import '../../widgets/mobile_osm_flutter.dart';
 
 MobileOSMController getOSMMap() => MobileOSMController();
@@ -477,6 +478,22 @@ class MobileOSMController extends IBaseOSMController {
       _idMap,
       p,
       globalKeyIcon: iconKey,
+    );
+  }
+
+  /// create marker int specific position without change map camera
+  ///
+  /// [p] : (GeoPoint) desired location
+  ///
+  /// [iconKey] : (GlobalKey) The GlobalKey of an icon obtained with the getIconMarkerKey() function
+  Future<void> addMarkerByImageBytes(
+      GeoPoint p,
+      ByteData byteData
+      ) async {
+    await osmPlatform.addMarkerByImageBytes(
+      _idMap,
+      p,
+      byteData,
     );
   }
 

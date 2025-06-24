@@ -502,6 +502,19 @@ class MapController extends BaseMapController {
       iconKey,
     );
   }
+  /// create marker int specific position without change map camera
+  ///
+  /// [p] : (GeoPoint) desired location
+  ///
+  /// [iconKey] : (GlobalKey) The GlobalKey of an icon obtained with the getIconMarkerKey() function
+  Future<void> addMarkerByImageBytes(
+      GeoPoint p,
+      ByteData byteData) async {
+    await osmBaseController.addMarkerByImageBytes(
+      p,
+      byteData,
+    );
+  }
   Future<void> addMarker(
     GeoPoint p, {
     MarkerIcon? markerIcon,

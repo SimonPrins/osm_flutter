@@ -4,6 +4,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'channel/osm_method_channel.dart';
 import 'common/osm_event.dart';
 import 'types/types.dart';
+import 'dart:typed_data' show ByteData;
 
 abstract class OSMPlatform extends PlatformInterface {
   OSMPlatform() : super(token: token);
@@ -102,10 +103,15 @@ abstract class MobileOSMPlatform extends OSMPlatform {
   );
 
   Future<void> addMarker(
-    int idOSM,
-    GeoPoint p, {
-    GlobalKey? globalKeyIcon,
-  });
+      int idOSM,
+      GeoPoint p, {
+        GlobalKey? globalKeyIcon,
+      });
+
+  Future<void> addMarkerByImageBytes(
+      int idOSM,
+      GeoPoint p,
+      ByteData byteData);
 
   Future<void> changeMarker(
     int idOSM,
