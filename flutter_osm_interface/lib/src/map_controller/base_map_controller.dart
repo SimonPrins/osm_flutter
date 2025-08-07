@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_osm_interface/flutter_osm_interface.dart';
+import 'package:flutter_osm_interface/src/osm_controller/osm_controller.dart';
+import 'package:flutter_osm_interface/src/types/types.dart';
+import 'package:flutter_osm_interface/src/map_controller/i_base_map_controller.dart';
 
 ///  class [BaseMapController] : base controller for osm flutter
 ///
@@ -12,21 +14,21 @@ import 'package:flutter_osm_interface/flutter_osm_interface.dart';
 /// [initPosition] : (GeoPoint) if it isn't null, the map will be pointed at this position
 abstract class BaseMapController extends IBaseMapController {
   late IBaseOSMController _osmBaseController;
+  @override
   final BoundingBox? areaLimit;
   final CustomTile? customTile;
   late Timer? _timer;
-
+  var _layerIsVisible = true;
   IBaseOSMController get osmBaseController => _osmBaseController;
-
+  final bool useExternalTracking;
   BaseMapController({
-    bool initMapWithUserPosition = true,
-    GeoPoint? initPosition,
+    super.initMapWithUserPosition,
+    super.initPosition,
     this.areaLimit = const BoundingBox.world(),
     this.customTile,
-  })  : assert(initMapWithUserPosition ^ (initPosition != null)),
+    this.useExternalTracking = false,
+  })  : assert((initMapWithUserPosition != null) ^ (initPosition != null)),
         super(
-          initMapWithUserPosition: initMapWithUserPosition,
-          initPosition: initPosition,
           areaLimit: areaLimit,
         );
 
@@ -37,7 +39,7 @@ abstract class BaseMapController extends IBaseMapController {
     if (_timer != null && _timer!.isActive) {
       _timer?.cancel();
     }
-    removeObserver();
+    removeObservers();
     super.dispose();
   }
 
@@ -45,14 +47,25 @@ abstract class BaseMapController extends IBaseMapController {
   @mustCallSuper
   @override
   void init() {
-    _timer = Timer(Duration(milliseconds: 1250), () async {
+    _timer = Timer(const Duration(milliseconds: 1250), () async {
       await osmBaseController.initPositionMap(
         initPosition: initPosition,
-        initWithUserPosition: initMapWithUserPosition,
+        userPositionOption: initMapWithUserPosition,
+        useExternalTracking: useExternalTracking,
       );
       _timer?.cancel();
     });
   }
+
+  /// [toggleLayersVisibility]
+  ///
+  /// this method hide/show all layer exist in the map
+  Future<void> toggleLayersVisibility() async {
+    _layerIsVisible = !_layerIsVisible;
+    await osmBaseController.toggleLayer(toggle: _layerIsVisible);
+  }
+
+  bool get isAllLayersVisible => _layerIsVisible;
 }
 
 extension OSMControllerOfBaseMapController on BaseMapController {

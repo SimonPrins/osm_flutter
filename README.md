@@ -1,11 +1,16 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/liodali/osm_flutter/0.70.1/.github/OSM%20Flutter%20Logo.png?sanitize=true" width="500px">
+</p>
+
 # flutter_osm_plugin 
-![pub](https://img.shields.io/badge/pub-v0.50.0-orange)   
+
+![pub](https://img.shields.io/badge/pub-v1.3.0-blue)   
 
 
 ## Platform Support
 | Android | iOS | Web |
 |:---:|:---:|:---:|
-| supported :heavy_check_mark: | supported :heavy_check_mark: (min iOS supported : 12) | 0.50.0 :heavy_check_mark: |
+| supported :heavy_check_mark: | supported :heavy_check_mark: (min iOS supported : 13) | supported :heavy_check_mark: |
 
 
 <b>osm plugin for flutter apps </b>
@@ -17,16 +22,18 @@
 * customize Icon Marker (Android/iOS/web)
 * customize user Marker (Android/iOS/web)
 * assisted selection position (Android/iOS)
-* set BoundingBox (Android/Web)
+* set BoundingBox (Android/iOS/Web)
 * zoom into region (Android/iOS/web)
-* draw Road,recuperate information (duration/distance) of the current road (Android/iOS/web)
+* draw Road  (Android/iOS/web)
+* draw dotted Road (Android/iOS/web)
+* recuperate information (instruction/duration/distance) of the current road  (Android/iOS/web)
 * draw Road manually (Android/iOS/web)
 * draw multiple Roads  (Android/iOS/web)
 * ClickListener on Marker (Android/iOS/web)
 * ClickListener on Map (Android/iOS/web)
 * calculate distance between 2 points 
 * address suggestion
-* draw shapes (Android/web)
+* draw shapes (Android/iOS/web)
 * simple dialog location picker (Android/iOS)
 * listen to region change (Android/iOS/Web)
 * set custom tiles (Android/iOS/Web) 
@@ -44,7 +51,7 @@
 Add the following to your `pubspec.yaml` file:
 
     dependencies:
-      flutter_osm_plugin: ^0.50.0-alpha.5
+      flutter_osm_plugin: ^1.3.0
 
 
 
@@ -96,38 +103,45 @@ many thanks for @ben-xD
 ```dart
  OSMFlutter( 
         controller:mapController,
-        trackMyPosition: false,
-        initZoom: 12,
-        minZoomLevel: 8,
-        maxZoomLevel: 14,
-        stepZoom: 1.0,
-        userLocationMarker: UserLocationMaker(
-            personMarker: MarkerIcon(
-                icon: Icon(
-                    Icons.location_history_rounded,
-                    color: Colors.red,
-                    size: 48,
+        osmOption: OSMOption(
+              userTrackingOption: UserTrackingOption(
+              enableTracking: true,
+              unFollowUser: false,
+            ),
+            zoomOption: ZoomOption(
+                  initZoom: 8,
+                  minZoomLevel: 3,
+                  maxZoomLevel: 19,
+                  stepZoom: 1.0,
+            ),
+            userLocationMarker: UserLocationMaker(
+                personMarker: MarkerIcon(
+                    icon: Icon(
+                        Icons.location_history_rounded,
+                        color: Colors.red,
+                        size: 48,
+                    ),
+                ),
+                directionArrowMarker: MarkerIcon(
+                    icon: Icon(
+                        Icons.double_arrow,
+                        size: 48,
+                    ),
                 ),
             ),
-            directionArrowMarker: MarkerIcon(
-                icon: Icon(
-                    Icons.double_arrow,
-                    size: 48,
-                ),
+            roadConfiguration: RoadOption(
+                    roadColor: Colors.yellowAccent,
             ),
-        ),
-         roadConfiguration: RoadOption(
-                roadColor: Colors.yellowAccent,
-        ),
-        markerOption: MarkerOption(
-            defaultMarker: MarkerIcon(
-                icon: Icon(
-                  Icons.person_pin_circle,
-                  color: Colors.blue,
-                  size: 56,
-                  ),
+            markerOption: MarkerOption(
+                defaultMarker: MarkerIcon(
+                    icon: Icon(
+                      Icons.person_pin_circle,
+                      color: Colors.blue,
+                      size: 56,
+                    ),
                 )
-        ),
+            ),
+        )
     );
 
 ```
@@ -144,46 +158,61 @@ many thanks for @ben-xD
 > or if you want to initialize the map with user position use `withUserPosition`
 
 ```dart
+// default constructor
  MapController controller = MapController(
-                            initMapWithUserPosition: false,
                             initPosition: GeoPoint(latitude: 47.4358055, longitude: 8.4737324),
                             areaLimit: BoundingBox( 
                                 east: 10.4922941, 
                                 north: 47.8084648, 
                                 south: 45.817995, 
                                 west:  5.9559113,
-                            ),
+                      ),
             );
-// or 
+// or set manually init position
+ final controller = MapController.withPosition(
+            initPosition: GeoPoint(
+              latitude: 47.4358055,
+              longitude: 8.4737324,
+          ),
+);
+// init the position using the user location
+final controller = MapController.withUserPosition(
+        trackUserLocation: UserTrackingOption(
+           enableTracking: true,
+           unFollowUser: false,
+        )
+)
 
- MapController controller = MapController.withPosition(
-                            initPosition: GeoPoint(
-                              latitude: 47.4358055,
-                               longitude: 8.4737324
-                            ,),
-                            areaLimit: BoundingBox( 
-                                east: 10.4922941, 
-                                north: 47.8084648, 
-                                south: 45.817995, 
-                                west:  5.9559113,
-                            ),
-            );
+// init the position using the user location and control map from outside
+final controller = MapController.withUserPosition(
+        trackUserLocation: UserTrackingOption(
+           enableTracking: true,
+           unFollowUser: false,
+        ),
+         useExternalTracking: true
+)
 ```
 
 
 
 <b>2) Dispose </b>
+
 ```dart
      controller.dispose();
 ```
-<b> 3) Properties  of `MapController` </b>
 
-| Properties                   | Description                                                             |
+<b> 3) Properties  of default `MapController` </b>
+
+> `MapController` has 2 named Constructor `MapController.withPosition`,
+`MapController.withUserPosition` to control initialization of the Map
+
+| Properties                   |  Description                                                        |
 | ---------------------------- | ----------------------------------------------------------------------- |
-| `initMapWithUserPosition`    | (bool) initialize map with user position (default:true                  |
+| `initMapWithUserPosition`    | (UserTrackingOption?) initialize map with user position   |
 | `initPosition`               | (GeoPoint) if it isn't null, the map will be pointed at this position   |
 | `areaLimit`                  | (Bounding) set area limit of the map (default BoundingBox.world())   |
 | `customLayer`                | (CustomTile) set customer layer  using different osm server , this attribute used only with named constructor `customLayer`  |
+| ` useExternalTracking`       | (bool) if true,we will disable our logic to show userlocation marker or to move to the user position |
 
 
 <b> 3.1) Custom Layers with  `MapController` </b>
@@ -193,7 +222,6 @@ many thanks for @ben-xD
 ```dart
 
 controller = MapController.customLayer(
-      initMapWithUserPosition: false,
       initPosition: GeoPoint(
         latitude: 47.4358055,
         longitude: 8.4737324,
@@ -205,6 +233,7 @@ controller = MapController.customLayer(
         maxZoomLevel: 19,
         urlsServers: [
          TileURLs(
+            //"https://tile.opentopomap.org/{z}/{x}/{y}"
             url: "https://tile.opentopomap.org/",
             subdomains: [],
           )
@@ -214,11 +243,13 @@ controller = MapController.customLayer(
     )
 
 ```
-* also,you can use our predefined custom tiles like 
-  * `cyclOSMLayer` constructor for cycling tiles
-  * `publicTransportationLayer` constructor for transport tiles ,it's public osm server
 
-for more example see our example in `home_example.dart`
+* also,you can use our predefined custom tiles like 
+* `cyclOSMLayer` constructor for cycling tiles
+* `publicTransportationLayer` constructor for transport tiles ,it's public osm server
+* we support full server path like `("https://tile.opentopomap.org/{z}/{x}/{y}")`
+
+For more example see our example in `home_example.dart`
 <br>
 <br>
 <b> 3.2) Change Layers in runtime </b>
@@ -299,27 +330,37 @@ without need to call `currentLocation`
 
 > when `enableStopFollow` is true,map will not be centered if the user location changed
 
-```dart
- await controller.enableTracking(enableStopFollow:false);
-```
+> you can disable rotation of personIcon using [disableUserMarkerRotation] (default: false)
 
+```dart
+ await controller.enableTracking(enableStopFollow:false,);
+```
+or 
+
+> use this method below if you want to control the map(move to the user location and show the marker) while receiving the user location
+
+```dart
+ await controller.startLocationUpdating();
+```
 <b> 9) Disable tracking user position </b>
 
 ```dart
  await controller.disabledTracking();
 ```
+or 
+
+> use this method below if you already used `startLocationUpdating`
+
+```dart
+ await controller.stopLocationUpdating();
+```
 
 <b>10) update the location </b>
 
-> this method will create marker on that specific position
-
-```dart
- await controller.changeLocation(GeoPoint(latitude: 47.35387, longitude: 8.43609));
-```
 > Change the location without create marker
 
 ```dart
- await controller.goToLocation(GeoPoint(latitude: 47.35387, longitude: 8.43609));
+ await controller.moveTo(GeoPoint(latitude: 47.35387, longitude: 8.43609),animate:true);
 ```
 
 
@@ -328,56 +369,30 @@ without need to call `currentLocation`
 ```dart
  GeoPoint geoPoint = await controller.myLocation();
 ```
-<b> 12) get center map </b>b>
+<b> 12) get center map </b>
 
 ```dart
 GeoPoint centerMap = await controller.centerMap;
 ```
-<b> 12.1) get geoPoint in the map </b>b>
+<b> 12.1) get geoPoint in the map </b>
 
 * recuperate geoPoint of marker add it by user except static points
 
 ```dart
 List<GeoPoint> geoPoints = await controller.geopoints;
 ```
-<b> 13) get bounding box  map </b>b>
+<b> 13) get bounding box  map </b>
 
 ```dart
 BoundingBox bounds = await controller.bounds;
 ```
 
-<b> 14) select/create new position </b>
+<b> 14) Map Listener  </b>
 
-* we have 2 way to select location in map
+> Get GeoPoint from  listener from controller directly
+ (for more example: see home_example.dart )
 
-<b>14.1 Manual selection (deprecated) </b>
-
-a) select without change default marker 
-```dart
- GeoPoint geoPoint = await controller.selectPosition();
-```
-b) select position with dynamic marker
- * Flutter widget 
-```dart
- GeoPoint geoPoint = await controller.selectPosition(
-     icon: MarkerIcon(
-                      icon: Icon(
-                        Icons.location_history,
-                        color: Colors.amber,
-                        size: 48,
-          ), 
-);
-```
- * image from network
- ```dart
-  GeoPoint geoPoint = await controller.selectPosition(  
-          imageURL: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/1.png"
-);
- ```
-
-c) select using listener from controller directly
-* for more example  see  home_example.dart 
-c.1) single tap listener
+a.1) single tap listener
 ```dart
 controller.listenerMapSingleTapping.addListener(() {
       if (controller.listenerMapSingleTapping.value != null) {
@@ -385,7 +400,7 @@ controller.listenerMapSingleTapping.addListener(() {
       }
     });
 ```
-c.2) long tap listener
+a.2) long tap listener
 ```dart
 controller.listenerMapLongTapping.addListener(() {
       if (controller.listenerMapLongTapping.value != null) {
@@ -393,7 +408,7 @@ controller.listenerMapLongTapping.addListener(() {
       }
     });
 ```
-c.3) region change listener
+a.3) region change listener
 ```dart
 controller.listenerRegionIsChanging.addListener(() {
       if (controller.listenerRegionIsChanging.value != null) {
@@ -401,27 +416,31 @@ controller.listenerRegionIsChanging.addListener(() {
       }
     });
 ```
-<b>14.2 Assisted selection </b> (for more details see example) 
-
-```dart
- /// To Start assisted Selection
- await controller.advancedPositionPicker();
- /// To get location desired
-  GeoPoint p = await controller.getCurrentPositionAdvancedPositionPicker();
-  /// To get location desired and close picker
- GeoPoint p = await controller.selectAdvancedPositionPicker();
- /// To cancel assisted Selection
- await controller.cancelAdvancedPositionPicker();
-```
-
 <b>15) Create Marker Programmatically </b>
 
 > you can change marker icon by using attribute `markerIcon`
+> the angle value should be between [0,2pi]
+> set anchor of ther Marker
 
 ```dart
-await controller.addMarker(GeoPoint,markerIcon:MarkerIcon,angle:pi/3);
+await controller.addMarker(GeoPoint,
+      markerIcon:MarkerIcon,
+      angle:pi/3,
+      anchor:IconAnchor(anchor: Anchor.top,)
+);
 ```
-<b> 15.1) Change Icon Marker  </b>
+ <b> 15.1) Update Marker </b>
+
+ > you can change the location,icon,angle,anchor of the specific marker
+
+ > The old configuration of the Marker will be keep it the same if not specificied
+
+
+```dart
+await controller.changeLocationMarker(oldGeoPoint,newGeoPoint,MarkerIcon,angle,IconAnchor);
+```
+
+<b> 15.2) Change Icon Marker  </b>
 
 > You can change marker icon by using attribute `markerIcon` of existing Marker
 > The GeoPoint/Marker should be exist
@@ -430,15 +449,15 @@ await controller.addMarker(GeoPoint,markerIcon:MarkerIcon,angle:pi/3);
 await controller.setMarkerIcon(GeoPoint,MarkerIcon);
 ```
 
-
-<b> 15.2) Remove marker </b>
+<b> 15.3) Remove marker </b>
 
 ```dart
  await controller.removeMarker(geoPoint);
 ```
 * PS : static position cannot be removed by this method 
 
-<b>16) Draw road,recuperate distance in km and duration in sec</b>
+
+<b>16) Draw road,recuperate instructions ,distance in km and duration in sec</b>
 
 > you can add an middle position to pass your route through them
 > change configuration of the road in runtime
@@ -459,6 +478,7 @@ await controller.setMarkerIcon(GeoPoint,MarkerIcon);
 );
  print("${roadInfo.distance}km");
  print("${roadInfo.duration}sec");
+ print("${roadInfo.instructions}");
 ```
 
 
@@ -472,9 +492,9 @@ await controller.setMarkerIcon(GeoPoint,MarkerIcon);
 | `roadBorderColor`        | (Color?) set color of border polyline       |
 | `roadBorderWidth`        | (double?) set border width of polyline, if width null or 0,polyline will drawed without border |
 | `zoomInto`               | (bool)  change zoom level to make the all the road visible (default:true)    |
+| `isDotted`               | (bool)  to draw dotted polyline   (default: false)    |
 
-
-
+**Note** drawing dotted polyline has limitation on web where we cannot draw dotted poyline with borderWidth > 0 
 
 <b> 16.b) draw road manually </b>
 ```dart
@@ -588,8 +608,10 @@ final configs = [
               centerPoint: GeoPoint(latitude: 47.4333594, longitude: 8.4680184),
               radius: 1200.0,
               color: Colors.red,
+              borderColor:Colors.green,
               strokeWidth: 0.3,
-            ));
+            )
+          );
  /// to remove Circle using Key
  await controller.removeCircle("circle0");
 
@@ -604,7 +626,8 @@ final configs = [
               key: "rect",
               centerPoint: GeoPoint(latitude: 47.4333594, longitude: 8.4680184),
               distance: 1200.0,
-              color: Colors.red,
+              color: Colors.red.withOpacity(0.4),
+              borderColor:Colors.green,
               strokeWidth: 0.3,
             ));
  /// to remove Rect using Key
@@ -631,12 +654,13 @@ final configs = [
 
 | Methods                       | Description                         |
 | ----------------------------- | ----------------------------------- |
-| `mapIsReady`                  | (callback) Should be override this method, to get notified when map is ready to go or not,     |
-| `mapRestored`                 | (callback) Should be override this method, to get notified when map is restored you can also add you bakcup   |
-| `onSingleTap`                 | (callback) Notified when user make single click on marker   |
-| `onLongTap`                   | (callback) Called when map make long click on marker   |
-| `onRegionChanged`             | (callback) Notified when map is change regsion (on moves)    |
-| `onRoadTap`                   | (callback) Notified when user click on the poyline (road)   |
+| `mapIsReady`                  | (callback) Should be override this method, to get notified when map is ready to go or not |
+| `mapRestored`                 | (callback) Should be override this method, to get notified when map is restored you can also add you backup |
+| `onSingleTap`                 | (callback) Called when the user makes single click on map |
+| `onLongTap`                   | (callback) Called when the user makes long click on map |
+| `onRegionChanged`             | (callback) Notified when map is change region (on moves) |
+| `onRoadTap`                   | (callback) Notified when user click on the polyline (road) |
+| `onLocationChanged`           | (callback) Notified when user location changed  |
 
 
 ** example 
@@ -660,7 +684,35 @@ class YourOwnStateWidget extends State<YourWidget> with OSMMixinObserver {
     super.mapRestored();
     /// TODO
   }
-    //etc
+    @override
+  void onSingleTap(GeoPoint position) {
+    super.onSingleTap();
+    /// TODO
+  }
+
+  @override
+  void onLongTap(GeoPoint position) {
+    super.onLongTap();
+    /// TODO
+
+  }
+
+  @override
+  void onRegionChanged(Region region) {
+    super.onRegionChanged();
+    /// TODO
+  }
+
+  @override
+  void onRoadTap(RoadInfo road) {
+    super.onRoadTap();
+    /// TODO
+  }
+  @override
+  void onLocationChanged(GeoPoint userLocation) {
+    super.onLocationChanged();
+    /// TODO
+  }
 }
 ```
 
@@ -671,24 +723,38 @@ class YourOwnStateWidget extends State<YourWidget> with OSMMixinObserver {
 | Properties                    | Description                         |
 | ----------------------------- | ----------------------------------- |
 | `mapIsLoading`                | (Widget)  show custom  widget when the map finish initialization     |
+| `osmOption`                   | (OSMOption) used to configure OSM Map such as zoom,road,userLocationMarker    |
+| `onGeoPointClicked`           | (callback) listener triggered when marker is clicked ,return current geoPoint of the marker         |
+| `onLocationChanged`           | (callback) it is fired when you activate tracking and  user position has been changed          |
+| `onMapMoved`                  | (callback) it is each the map moved user handler or navigate to another location using APIs       |
+| `onMapIsReady`                | (callback) listener trigger to get map is initialized or not |
+
+## `OSMOption` 
+
+| Properties                    | Description                         |
+| ----------------------------- | ----------------------------------- |
+| `mapIsLoading`                | (Widget)  show custom  widget when the map finish initialization     |
 | `trackMyPosition`             | enable tracking user position.     |
 | `showZoomController`          | show default zoom controller.       |
 | `userLocationMarker`          | change user marker or direction marker icon in tracking location                |
 | `markerOption`                | configure marker of osm map                   |
-| `stepZoom`                    | set step zoom to use in zoomIn()/zoomOut() (default 1)       |
-| `initZoom`                    | set init zoom level in the map (default 10)       |
-| `maxZoomLevel`                | set maximum zoom level in the map  (2 <= x <= 19)       |
-| `minZoomLevel`                | set minimum zoom level in the map  (2 <= x <= 19 )       |
+| `zoomOption`                  | set  configuration for zoom in the Map
 | `roadConfiguration`           | (RoadOption) set  default color,width,borderColor,borderWdith for polylines |
 | `staticPoints`                | List of Markers you want to show always ,should every marker have unique id |
-| `onGeoPointClicked`           | (callback) listener triggered when marker is clicked ,return current geoPoint of the marker         |
-| `onLocationChanged`           | (callback) it is fired when you activate tracking and  user position has been changed          |
-| `onMapIsReady`                | (callback) listener trigger to get map is initialized or not |
+| `showContributorBadgeForOSM`  | (bool) enable to show copyright widget of osm in the map  |
+| `enableRotationByGesture`     | (bool) enable to rotation gesture for map, default: false  |
 | `showDefaultInfoWindow`       | (bool) enable/disable default infoWindow of marker (default = false)         |
 | `isPicker`                    | (bool) enable advanced picker from init of  the map (default = false)         |
-| `showContributorBadgeForOSM`  | (bool) enable to show copyright widget of osm in the map  |
-| `androidHotReloadSupport`     | (bool) enable to restart  osm map in android to support hotReload, default: false  |
 
+
+## `ZoomOption`
+
+| Properties                    | Description                                                  |
+| ----------------------------- | ------------------------------------------------------------ |
+| `stepZoom`                    | set step zoom to use in zoomIn()/zoomOut() (default 1)       |
+| `initZoom`                    | set init zoom level in the map (default 10)                  |
+| `maxZoomLevel`                | set maximum zoom level in the map  (2 <= x <= 19)            |
+| `minZoomLevel`                | set minimum zoom level in the map  (2 <= x <= 19 )           |
 
 ### Custom Controller
 > To create your own MapController to need to extends from `BaseMapController`,
@@ -711,7 +777,28 @@ class CustomMapController extends BaseMapController {
   }
 }
 ```
+### STATIC Map: 
 
+> using `OSMViewer` we can show static map that contain on location
+
+
+```dart
+OSMViewer(
+        controller: SimpleMapController(
+          initPosition: GeoPoint(
+              latitude: 47.4358055,
+              longitude: 8.4737324,
+          ),
+        markerHome: const MarkerIcon(
+            icon: Icon(Icons.home),
+          ),
+        ),
+        zoomOption: const ZoomOption(
+        initZoom: 16,
+        minZoomLevel: 11,
+    )
+
+```
 
 
 ## STATIC METHODS:

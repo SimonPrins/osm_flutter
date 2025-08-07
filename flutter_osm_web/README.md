@@ -1,15 +1,9 @@
 # flutter_osm_web
 
-A new flutter plugin project.
+A Web Osm flutter plugin for OSM Flutter plugin.
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+if you want to build your app to web wasm
+add this version for now `flutter_osm_web: 1.2.0-wasm` until wasm become default option then 
+it will be integrated in our main plugin

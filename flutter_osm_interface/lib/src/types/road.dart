@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_interface/src/common/utilities.dart';
 import 'geo_point.dart';
@@ -9,8 +7,6 @@ enum RoadType {
   foot,
   bike,
 }
-
-
 
 /// [RoadOption]
 ///
@@ -29,24 +25,27 @@ enum RoadType {
 /// [zoomInto]             : (bool) to zoomIn/Out that will make all the road visible in the map (default false)
 class RoadOption {
   final Color roadColor;
-  final int roadWidth;
+  final double roadWidth;
   final bool zoomInto;
   final Color? roadBorderColor;
-  final double roadBorderWidth;
+  final double? roadBorderWidth;
+  final bool isDotted;
 
   const RoadOption({
     required this.roadColor,
     this.roadWidth = 5,
     this.roadBorderColor,
     this.zoomInto = true,
-    this.roadBorderWidth = 0,
-  })  : assert(roadBorderWidth >= 0),
+    this.isDotted = false,
+    this.roadBorderWidth,
+  })  : assert(roadBorderWidth == null || roadBorderWidth > 0),
         assert(roadWidth > 0);
 
   const RoadOption.empty()
       : roadWidth = 5,
         roadColor = Colors.green,
         zoomInto = false,
+        isDotted = false,
         roadBorderWidth = 0,
         roadBorderColor = null;
 
@@ -54,24 +53,31 @@ class RoadOption {
     Map args = {};
 
     /// disable/show markers in start,middle,end points
+    if (roadBorderWidth != null && roadBorderWidth! > 0) {
+      args.putIfAbsent(
+        "roadBorderWidth",
+        () => roadBorderWidth,
+      );
+    }
     args.putIfAbsent(
-      "roadBorderWidth",
-      () => Platform.isIOS ? "${roadBorderWidth}px" : roadBorderWidth,
+      "zoomIntoRegion",
+      () => zoomInto,
     );
-
     args.putIfAbsent(
       "zoomIntoRegion",
       () => zoomInto,
     );
     args.addAll(roadColor.toMapPlatform("roadColor"));
     args.putIfAbsent(
-      "roadWidth",
-      () => Platform.isIOS ? "${roadWidth}px" : roadWidth.toDouble(),
+      "isDotted",
+      () => isDotted,
     );
-    args.putIfAbsent(
-      "roadBorderColor",
-      () => (roadBorderColor ?? (roadColor).dark()).toPlatform(),
-    );
+    if (roadBorderColor != null) {
+      args.putIfAbsent(
+        "roadBorderColor",
+        () => (roadBorderColor!).toPlatform(),
+      );
+    }
 
     return args;
   }
@@ -86,20 +92,17 @@ class MultiRoadOption extends RoadOption {
   final RoadType roadType;
 
   const MultiRoadOption({
-    required Color roadColor,
-    int roadWidth = 5,
+    required super.roadColor,
+    super.roadWidth,
     this.roadType = RoadType.car,
-    Color? roadBorderColor,
-    double? roadBorderWidth,
+    super.roadBorderColor,
+    super.roadBorderWidth,
   }) : super(
-          roadColor: roadColor,
-          roadWidth: roadWidth,
           zoomInto: false,
-          roadBorderColor: roadBorderColor,
         );
 
   const MultiRoadOption.empty()
-      : this.roadType = RoadType.car,
+      : roadType = RoadType.car,
         super(
           roadColor: Colors.green,
           zoomInto: false,
@@ -143,43 +146,52 @@ class RoadInfo {
   final double? distance;
   final double? duration;
   final List<GeoPoint> route;
+  final List<Instruction> instructions;
   late String _key;
   RoadInfo({
     this.distance,
     this.duration,
     this.route = const [],
+    this.instructions = const [],
   }) : _key = UniqueKey().toString();
 
   RoadInfo.fromMap(Map map)
       : _key = map["key"] ?? UniqueKey().toString(),
-        this.duration = map["duration"],
-        this.distance = map["distance"],
-        this.route = map.containsKey(map)
+        duration = map["duration"],
+        distance = map["distance"],
+        instructions = map.containsKey("instructions")
+            ? (map["instructions"] as List)
+                .map((e) => Instruction.fromMap(e))
+                .toList()
+            : [],
+        route = map.containsKey('routePoints')
             ? (map["routePoints"] as String).stringToGeoPoints()
             : [];
   RoadInfo copyWith({
     String? roadKey,
     double? distance,
     double? duration,
+    List<Instruction>? instructions = const [],
     List<GeoPoint>? route = const [],
   }) {
     return RoadInfo(
       distance: distance ?? this.distance,
       duration: duration ?? this.duration,
       route: route ?? this.route,
-    )..setKey(roadKey ?? this._key);
+      instructions: instructions ?? this.instructions,
+    )..setKey(roadKey ?? _key);
   }
 
   RoadInfo copyFromMap({
     required Map map,
   }) {
     return RoadInfo(
-      distance: map["duration"] ?? this.distance,
-      duration: map["distance"] ?? this.duration,
+      distance: map["duration"] ?? distance,
+      duration: map["distance"] ?? duration,
       route: map.containsKey(map)
           ? (map["routePoints"] as String).stringToGeoPoints()
-          : this.route,
-    )..setKey(this._key);
+          : route,
+    )..setKey(_key);
   }
 
   String get key => _key;
@@ -198,7 +210,25 @@ class RoadInfo {
 
   @override
   String toString() {
-    return "key:$key,distance:$distance,duration:$duration";
+    return "key : $key, distance: $distance, duration : $duration";
+  }
+}
+
+class Instruction {
+  final String instruction;
+  final GeoPoint geoPoint;
+
+  Instruction({
+    required this.instruction,
+    required this.geoPoint,
+  });
+  Instruction.fromMap(Map map)
+      : instruction = map["instruction"],
+        geoPoint = GeoPoint.fromMap(map["geoPoint"]);
+
+  @override
+  String toString() {
+    return instruction;
   }
 }
 

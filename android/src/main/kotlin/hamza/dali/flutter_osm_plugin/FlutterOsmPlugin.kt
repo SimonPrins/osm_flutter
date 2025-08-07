@@ -9,29 +9,25 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.preference.PreferenceManager
-import hamza.dali.flutter_osm_plugin.utilities.MapSnapShot
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
-import io.flutter.plugin.common.PluginRegistry
 import org.osmdroid.config.Configuration
 import java.util.concurrent.atomic.AtomicInteger
 
 
 class FlutterOsmPlugin :
     FlutterPlugin, ActivityAware {
-    var factory: OsmFactory? = null
+    private var factory: OsmFactory? = null
     companion object {
-        var mapSnapShots = ArrayMap<String, MapSnapShot>()
+
         var lastKeysRestarted: ArrayMap<String, Boolean>? = ArrayMap()
-
-
         var state = AtomicInteger(0)
         var pluginBinding: ActivityPluginBinding? = null
         var lifecycle: Lifecycle? = null
-        var register: PluginRegistry.Registrar? = null
+        //private var register: PluginRegistry.Registrar? = null
         const val VIEW_TYPE = "plugins.dali.hamza/osmview"
         const val CREATED = 1
         const val STARTED = 2
@@ -40,7 +36,7 @@ class FlutterOsmPlugin :
         const val STOPPED = 5
         const val DESTROYED = 6
 
-        @JvmStatic
+        /*@JvmStatic
         fun registerWith(register: PluginRegistry.Registrar) {
             val registerActivity: Activity = register.activity() ?: return
             this.register = register
@@ -57,7 +53,7 @@ class FlutterOsmPlugin :
                     },
                 ),
             )
-        }
+        }*/
     }
 
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
@@ -68,7 +64,7 @@ class FlutterOsmPlugin :
         factory = OsmFactory(
             binding.binaryMessenger,
             object : ProviderLifecycle {
-                override fun getLifecyle(): Lifecycle? = lifecycle
+                override fun getOSMLifecycle(): Lifecycle? = lifecycle
             },
         )
         binding.platformViewRegistry.registerViewFactory(
@@ -107,20 +103,19 @@ class FlutterOsmPlugin :
         //lifecycle?.removeObserver(this)
         lifecycle = null
         pluginBinding = null
-
     }
 
 }
 
 interface ProviderLifecycle {
-    fun getLifecyle(): Lifecycle?
+    fun getOSMLifecycle(): Lifecycle?
 }
 
 private class ProxyLifecycleProvider constructor(
     activity: Activity
 ) : Application.ActivityLifecycleCallbacks, LifecycleOwner, ProviderLifecycle {
 
-    val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
+    override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
     var registrarActivityHashCode: Int = activity.hashCode()
 
     init {
@@ -172,8 +167,6 @@ private class ProxyLifecycleProvider constructor(
     }
 
 
-    override fun getLifecyle(): Lifecycle = lifecycle
-
-    override fun getLifecycle(): Lifecycle = lifecycle
+    override fun getOSMLifecycle(): Lifecycle = lifecycle
 
 }

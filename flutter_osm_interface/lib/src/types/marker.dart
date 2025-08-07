@@ -1,22 +1,99 @@
 import 'package:flutter/material.dart';
 
+typedef IconAnchorOffset = ({double x, double y});
+
+enum Anchor {
+  center(
+    "center",
+    value: (0.5, 0.5),
+  ),
+  left(
+    "left",
+    value: (1, 0.5),
+  ),
+  right(
+    "right",
+    value: (0, 0.5),
+  ),
+  top(
+    "top",
+    value: (0.5, 1),
+  ),
+  bottom(
+    "bottom",
+    value: (0.5, 0),
+  ),
+  top_left(
+    "top-left",
+    value: (1, 1),
+  ),
+  top_right(
+    "top-right",
+    value: (0, 1),
+  ),
+  bottom_left(
+    "bottom-left",
+    value: (1, 0),
+  ),
+  bottom_right(
+    "bottom-right",
+    value: (0, 0),
+  );
+
+  const Anchor(
+    this.name, {
+    required this.value,
+  });
+  final String name;
+  final (double, double) value;
+
+  dynamic toMap() {
+    return [
+      value.$1,
+      value.$2,
+    ];
+  }
+
+}
+
+class IconAnchor {
+  final Anchor anchor;
+  final IconAnchorOffset? offset;
+
+  IconAnchor({
+    this.anchor = Anchor.center,
+    this.offset,
+  });
+
+  Map<String, dynamic> toMap() {
+    final map = <String, dynamic>{
+      "x": anchor.value.$1,
+      "y": anchor.value.$2,
+      "anchor": anchor.name,
+    };
+    if (offset != null) {
+      map["offset"] = {
+        "x": offset!.x,
+        "y": offset!.y,
+      };
+    }
+    return map;
+  }
+}
+
 class MarkerOption {
   final MarkerIcon? defaultMarker;
-  final MarkerIcon? advancedPickerMarker;
 
   MarkerOption({
     this.defaultMarker,
-    this.advancedPickerMarker,
   });
 
   MarkerOption copyWith({
     MarkerIcon? defaultMarker,
-    MarkerIcon? advancedPickerMarker,
   }) {
     return MarkerOption(
-        defaultMarker: defaultMarker ?? this.defaultMarker,
-        advancedPickerMarker:
-            advancedPickerMarker ?? this.advancedPickerMarker);
+      defaultMarker: defaultMarker ?? this.defaultMarker,
+    );
   }
 }
 
@@ -51,15 +128,14 @@ class MarkerIcon extends StatelessWidget {
     this.icon,
     this.assetMarker,
     this.iconWidget,
-    Key? key,
+    super.key,
   })  : assert((icon != null && assetMarker == null && iconWidget == null) ||
             (iconWidget != null && assetMarker == null && icon == null) ||
-            (assetMarker != null && icon == null && iconWidget == null)),
-        super(key: key);
+            (assetMarker != null && icon == null && iconWidget == null));
 
   @override
   Widget build(BuildContext context) {
-    Widget? child = SizedBox.shrink();
+    Widget? child = const SizedBox.shrink();
     if (icon != null) {
       child = icon;
     } else if (assetMarker != null) {

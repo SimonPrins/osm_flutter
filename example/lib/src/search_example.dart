@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 class LocationAppExample extends StatefulWidget {
+  const LocationAppExample({super.key});
+
   @override
   State<StatefulWidget> createState() => _LocationAppExampleState();
 }
@@ -15,7 +18,7 @@ class _LocationAppExampleState extends State<LocationAppExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("search picker example"),
+        title: const Text("search picker example"),
       ),
       body: Center(
         child: Column(
@@ -28,7 +31,7 @@ class _LocationAppExampleState extends State<LocationAppExample> {
               builder: (ctx, p, child) {
                 return Center(
                   child: Text(
-                    "${p?.toString() ?? ""}",
+                    p?.toString() ?? "",
                     textAlign: TextAlign.center,
                   ),
                 );
@@ -43,7 +46,7 @@ class _LocationAppExampleState extends State<LocationAppExample> {
                       notifier.value = p as GeoPoint;
                     }
                   },
-                  child: Text("pick address"),
+                  child: const Text("pick address"),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -52,8 +55,9 @@ class _LocationAppExampleState extends State<LocationAppExample> {
                       isDismissible: true,
                       title: "location picker",
                       textConfirmPicker: "pick",
-                      initCurrentUserPosition: false,
-                      initZoom: 8,
+                      zoomOption: const ZoomOption(
+                        initZoom: 8,
+                      ),
                       initPosition: GeoPoint(
                         latitude: 47.4358055,
                         longitude: 8.4737324,
@@ -64,7 +68,7 @@ class _LocationAppExampleState extends State<LocationAppExample> {
                       notifier.value = p;
                     }
                   },
-                  child: Text("show picker address"),
+                  child: const Text("show picker address"),
                 )
               ],
             ),
@@ -76,6 +80,8 @@ class _LocationAppExampleState extends State<LocationAppExample> {
 }
 
 class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
+
   @override
   State<StatefulWidget> createState() => _SearchPageState();
 }
@@ -83,7 +89,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   late TextEditingController textEditingController = TextEditingController();
   late PickerMapController controller = PickerMapController(
-    initMapWithUserPosition: true,
+    initMapWithUserPosition: const UserTrackingOption(),
   );
 
   @override
@@ -106,6 +112,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return CustomPickerLocation(
       controller: controller,
+      showDefaultMarkerPickWidget: true,
       topWidgetPicker: Padding(
         padding: const EdgeInsets.only(
           top: 56,
@@ -116,87 +123,98 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             Row(
               children: [
-                TextButton(
-                  style: TextButton.styleFrom(),
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Icon(
-                    Icons.arrow_back_ios,
+                PointerInterceptor(
+                  child: TextButton(
+                    style: TextButton.styleFrom(),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Icon(
+                      Icons.arrow_back_ios,
+                    ),
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: textEditingController,
-                    onEditingComplete: () async {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                    },
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.black,
-                      ),
-                      suffix: ValueListenableBuilder<TextEditingValue>(
-                        valueListenable: textEditingController,
-                        builder: (ctx, text, child) {
-                          if (text.text.isNotEmpty) {
-                            return child!;
-                          }
-                          return SizedBox.shrink();
-                        },
-                        child: InkWell(
-                          focusNode: FocusNode(),
-                          onTap: () {
-                            textEditingController.clear();
-                            controller.setSearchableText("");
-                            FocusScope.of(context)
-                                .requestFocus(new FocusNode());
+                  child: PointerInterceptor(
+                    child: TextField(
+                      controller: textEditingController,
+                      onEditingComplete: () async {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.black,
+                        ),
+                        suffix: ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: textEditingController,
+                          builder: (ctx, text, child) {
+                            if (text.text.isNotEmpty) {
+                              return child!;
+                            }
+                            return const SizedBox.shrink();
                           },
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: Colors.black,
+                          child: InkWell(
+                            focusNode: FocusNode(),
+                            onTap: () {
+                              textEditingController.clear();
+                              controller.setSearchableText("");
+                              FocusScope.of(context)
+                                  .requestFocus(FocusNode());
+                            },
+                            child: const Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      focusColor: Colors.black,
-                      filled: true,
-                      hintText: "search",
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      fillColor: Colors.grey[300],
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
+                        focusColor: Colors.black,
+                        filled: true,
+                        hintText: "search",
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        fillColor: Colors.grey[300],
+                        errorBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
-            TopSearchWidget()
+            const TopSearchWidget()
           ],
         ),
       ),
       bottomWidgetPicker: Positioned(
         bottom: 12,
         right: 8,
-        child: FloatingActionButton(
-          onPressed: () async {
-            GeoPoint p = await controller.selectAdvancedPositionPicker();
-            Navigator.pop(context, p);
-          },
-          child: Icon(Icons.arrow_forward),
+        child: PointerInterceptor(
+          child: FloatingActionButton(
+            onPressed: () async {
+              GeoPoint p = await controller.selectAdvancedPositionPicker();
+               if (!context.mounted) return;
+              Navigator.pop(context, p);
+            },
+            child: const Icon(Icons.arrow_forward),
+          ),
         ),
       ),
-      pickerConfig: CustomPickerLocationConfig(
-        initZoom: 8,
+      pickerConfig: const CustomPickerLocationConfig(
+        zoomOption: ZoomOption(
+          initZoom: 8,
+        ),
       ),
     );
   }
 }
 
 class TopSearchWidget extends StatefulWidget {
+  const TopSearchWidget({super.key});
+
   @override
   State<StatefulWidget> createState() => _TopSearchWidgetState();
 }
@@ -210,7 +228,7 @@ class _TopSearchWidgetState extends State<TopSearchWidget> {
   late Future<List<SearchInfo>> _futureSuggestionAddress;
   String oldText = "";
   Timer? _timerToStartSuggestionReq;
-  final Key streamKey = Key("streamAddressSug");
+  final Key streamKey = const Key("streamAddressSug");
 
   @override
   void initState() {
@@ -228,7 +246,7 @@ class _TopSearchWidgetState extends State<TopSearchWidget> {
         _timerToStartSuggestionReq!.cancel();
       }
       _timerToStartSuggestionReq =
-          Timer.periodic(Duration(seconds: 3), (timer) async {
+          Timer.periodic(const Duration(seconds: 3), (timer) async {
         await suggestionProcessing(v);
         timer.cancel();
       });
@@ -269,7 +287,7 @@ class _TopSearchWidgetState extends State<TopSearchWidget> {
       valueListenable: notifierAutoCompletion,
       builder: (ctx, isVisible, child) {
         return AnimatedContainer(
-          duration: Duration(
+          duration: const Duration(
             milliseconds: 500,
           ),
           height: isVisible ? MediaQuery.of(context).size.height / 4 : 0,
@@ -286,38 +304,41 @@ class _TopSearchWidgetState extends State<TopSearchWidget> {
             return ListView.builder(
               itemExtent: 50.0,
               itemBuilder: (ctx, index) {
-                return ListTile(
-                  title: Text(
-                    snap.data![index].address.toString(),
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                  ),
-                  onTap: () async {
-                    /// go to location selected by address
-                    controller.goToLocation(
-                      snap.data![index].point!,
-                    );
+                return PointerInterceptor(
+                  child: ListTile(
+                    title: Text(
+                      snap.data![index].address.toString(),
+                      maxLines: 1,
+                      overflow: TextOverflow.fade,
+                    ),
+                    onTap: () async {
+                      /// go to location selected by address
+                      controller.goToLocation(
+                        snap.data![index].point!,
+                      );
 
-                    /// hide suggestion card
-                    notifierAutoCompletion.value = false;
-                    await reInitStream();
-                    FocusScope.of(context).requestFocus(
-                      new FocusNode(),
-                    );
-                  },
+                      /// hide suggestion card
+                      notifierAutoCompletion.value = false;
+                      await reInitStream();
+                       if (!context.mounted) return;
+                      FocusScope.of(context).requestFocus(
+                        FocusNode(),
+                      );
+                    },
+                  ),
                 );
               },
               itemCount: snap.data!.length,
             );
           }
           if (snap.connectionState == ConnectionState.waiting) {
-            return Card(
+            return const Card(
               child: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
-          return SizedBox();
+          return const SizedBox();
         },
       ),
     );

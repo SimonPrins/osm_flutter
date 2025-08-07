@@ -49,3 +49,6 @@ build/
 /example/.env
 /example/pubspec.lock
 pubspec.lock
+.vscode/**
+
+**/ios/Frameworks/**

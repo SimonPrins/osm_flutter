@@ -1,3 +1,134 @@
+### 1.3.0:
+* add new attribute `isDotted` to `RoadOption`  to draw dotted line
+* fix bug related to draw shapes in mobile side
+### 1.2.0:
+* Create new widget `OSMViewer` as static map
+* Add `SimpleMapController` as controller to manipulate `OSMViewer`
+* Improve BoundingBox API
+### 1.1.0:
+* fix bug in drawMultiRoad #530
+* improve customTile where we added the support for full url
+* improve lints
+### 1.0.5:
+* remove unnecessary internal APIs
+* fix lastknownLocation in android
+### 1.0.4:
+* fix bug #527
+### 1.0.3:
+* fix bug #521
+* fix bug related to removeMarker,removeMarker in iOS #508
+### 1.0.2:
+* fix bug #519 
+### 1.0.1: 
+* fix bug #518
+### 1.0.0: Update iOS SDK, Stablize APIs
+* replace Tangram es with another ios sdk
+* add `startLocationUpdating`,`stopLocationUpdating` for external control of user location
+* fix some bugs
+* migrate to wasm for web
+* replace gotoPosition by moveTo
+### 1.0.0-rc.6: update dependencies
+### 1.0.0-rc.5: fix userlocation in android
+* fix user location tracking in android side (bug:#507)
+### 1.0.0-rc.4: fix userlocation in ios
+* update ios sdk and fix bug related to userlocation 
+* fix draw border for road in ios side 
+### 1.0.0-rc.3: fix bugs
+* fix bug related to user location in android #507
+* update docs(thanx to @vargab95)
+### 1.0.0-rc.2: update web dependency
+* migrate to wasm
+### 1.0.0-rc.1: 
+* fix bug #500
+### 1.0.0-rc:
+* add support draw shapes in iOS side
+### 1.0.0-dev.4:
+* improve picker_map_controller
+* improve picker dialog and widget
+### 1.0.0-dev.3:
+* Dix bug in init map with zoomOption in iOS side
+* Add `isEqual` method to `GeoPoint`
+* Improve/fix bug in ios sdk
+### 1.0.0-dev.2:
+* fix bugs for angle/iconAnchor in web side
+* fix bug for iconAnchor in iOS side
+* fix customTile in ios when it's null
+### 1.0.0-dev.1 : 
+* update readme
+### 1.0.0-dev : 
+* switch iOS sdk
+* remove advPicker API
+* add toggleLayerVisibility
+* fix bugs
+### 0.70.4 : fix bugs
+* fix bug related to user location in android ( #482, thnx for @vargab95)
+* fix launchURl (thnx for @derklaro)### 0.70.3 :
+* fix bug #480
+### 0.70.2 :
+* fix bugs (thanks for @JobiJoba)
+### 0.70.1 :
+* update dependencies, fix namespaces for gradle 8.0
+### 0.70.0 :
+* add anchor to UserLocation
+* add onLocationChanged to osmMixin
+* fix bugs
+* some improvement for web side
+### 0.60.5 : 
+* fix bug #452
+### 0.60.4 :
+* fix bug in cache marker in android #445
+### 0.60.3 : 
+* fix bugs related to icon size for user location #440
+* fix bugs related to camera map rotation #355
+### 0.60.2 : fix bugs #433,#434
+* remove `androidHotReloadSupport` from OSMOption
+* fix parsing route in `RoadInfo`
+### 0.60.1 :  
+* fix issue
+### 0.60.0+3 : 
+* fix py script for automator
+### 0.60.0+2 : 
+* forget update changelog
+### 0.60.0+1 : 
+* fix issue
+### 0.60.0 : Improvement API and fix bugs ( contain break changes )
+* Add iconAnchor for addMarker/changeLocationMarker
+* Fix bugs #420 , #262 , #430 , #419
+* Add `OSMOption` as configuration for `OSMFlutter`
+### 0.55.3 : fix bugs
+* fix angle for addMarker where it should be between 0 and 2pi
+### 0.55.2 : fix bugs
+* fix issue related to rotate markers
+### 0.55.1+1 : 
+* fix readme
+### 0.55.1 : 
+* fix bugs
+### 0.55.0 : add UserTrackingOption to MapController
+* create UserTrackOption class and add it MapController
+### 0.54.2 : fix bugs
+* fix bug #407
+* fix jdk 17 to 8
+### 0.54.1 : fix bugs
+* fix bug #407,#403
+### 0.54.0 : improvement and fix bugs
+* migrate to v3.10
+* fix bugs #407 #409
+* add support rotation by gesture for android/ios (add `enableRotationByGesture` attribute)
+### 0.53.4+1 : fix bug
+* fix web_widget platform by removing the cast
+### 0.53.4 : fix bug #385
+* improve js/dart code to manage show multiple maps in web side
+### 0.53.3 : Improve instruction for roadInfo in web
+### 0.53.2 : Improve instruction for roadInfo in iOS
+* re-impl build intruction retrieved fron orsm api in drawRoad
+### 0.53.1 : improve add OSMMixinObserver
+* improve implementation of  OSMMixinObserver in mobile,web
+### 0.53.0 :new feature 
+* disable rotation for person marker
+* add instruction in RoadInfo
+### 0.51.0 :  fix bugs,add new API
+* add removeMarkers
+* fix bug name attribute zoomInto in android 
 ### 0.50.0 :  add Web support,improve road APIs
 * add `roadBorderColor`,`roadBorderWidth` to [RoadOption]
 * remove `keepInitialGeoPoints` and `showMarkerOfPOI`

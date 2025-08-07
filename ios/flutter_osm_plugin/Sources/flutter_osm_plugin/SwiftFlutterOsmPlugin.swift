@@ -12,11 +12,17 @@ public class SwiftFlutterOsmPlugin: NSObject, FlutterPlugin {
         //let instance = SwiftFlutterOsmPlugin()
         //registrar(forPlugin:"plugins.dali.hamza/osmview")
         //.register(mapViewFactory, withId: "plugins.dali.hamza/osmview")
-
-        let mapViewFactory = MapviewFactory(controller: controller, messenger: controller.binaryMessenger)
+        let keyDefaultPin = controller.lookupKey(forAsset: "packages/flutter_osm_plugin/assets/default_pin.png")
+        let mainBundle = Bundle.main
+        let pathDefaultPin = mainBundle.path(forResource: keyDefaultPin, ofType: nil)
+        let mapViewFactory = MapviewFactory(
+            controller: controller,
+            messenger: controller.binaryMessenger,
+            defaultPin: pathDefaultPin
+        )
 
         registrar.register(mapViewFactory, withId: "plugins.dali.hamza/osmview")
-
+        
         // registrar.addMethodCallDelegate(instance, channel: channel)
     }
 

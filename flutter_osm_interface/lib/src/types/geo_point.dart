@@ -2,7 +2,17 @@ import 'dart:math';
 
 import 'package:flutter_osm_interface/src/common/utilities.dart';
 
-///[GeoPoint]:class contain longitude and latitude of geographic position
+typedef UserLocation = GeoPointWithOrientation;
+
+///[GeoPoint]
+///
+/// illustrate geographique location thats contain longitude and latitude position
+///
+/// [GeoPoint] accept Map that has two keys with values which keys should be has names as lat,lon
+///
+/// [GeoPoint] accept String where in should be in format lat,lon example
+///  ``` GeoPoint('8.42,12.435') ```
+///
 /// [longitude] : (double)
 /// [latitude] : (double)
 class GeoPoint {
@@ -14,13 +24,15 @@ class GeoPoint {
     required this.longitude,
   });
 
-  GeoPoint.fromMap(Map m)
-      : this.latitude = m["lat"],
-        this.longitude = m["lon"];
+  GeoPoint.fromMap(
+    Map m,
+  )   : latitude = double.parse(m["lat"].toString()),
+        longitude = double.parse(m["lon"].toString());
 
-  GeoPoint.fromString(String m)
-      : this.latitude = double.parse(m.split(",").first),
-        this.longitude = double.parse(m.split(",").last);
+  GeoPoint.fromString(
+    String m,
+  )   : latitude = double.parse(m.split(",").first),
+        longitude = double.parse(m.split(",").last);
 
   Map<String, double> toMap() {
     return {
@@ -83,23 +95,25 @@ class GeoPointWithOrientation extends GeoPoint {
   final double angle;
 
   GeoPointWithOrientation({
-    this.angle = 0.0,
-    required double latitude,
-    required double longitude,
-  }) : super(
-          latitude: latitude,
-          longitude: longitude,
-        );
+    double angle = 0.0,
+    required super.latitude,
+    required super.longitude,
+  })  : angle = angle * pi / 180;
   GeoPointWithOrientation.radian({
     double radianAngle = 0.0,
-    required double latitude,
-    required double longitude,
-  })  : angle = radianAngle * (180 / pi),
+    required super.latitude,
+    required super.longitude,
+  })  : angle = radianAngle;
+  GeoPointWithOrientation.fromMap(Map json)
+      : angle = json.containsKey("heading")
+            ? double.tryParse(json["heading"].toString()) ?? 0
+            : 0,
         super(
-          latitude: latitude,
-          longitude: longitude,
+          latitude: json["lat"],
+          longitude: json["lon"],
         );
 
+  @override
   Map<String, double> toMap() {
     return super.toMap()..putIfAbsent("angle", () => angle);
   }

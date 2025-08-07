@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_interface/flutter_osm_interface.dart';
 import 'package:flutter_osm_web/flutter_osm_web.dart';
+import 'package:flutter_osm_web/src/controller/web_osm_controller.dart';
 
 class OsmWebWidget extends StatefulWidget {
-  final IBaseMapController controller;
+  final BaseMapController controller;
+
+  final UserTrackingOption? userTrackingOption;
   final List<StaticPositionGeoPoint> staticPoints;
   final OnGeoPointClicked? onGeoPointClicked;
   final OnLocationChanged? onLocationChanged;
+  final OnMapMoved? onMapMoved;
   final ValueNotifier<bool> mapIsReadyListener;
   final Widget? mapIsLoading;
   final List<GlobalKey> globalKeys;
   final Map<String, GlobalKey> staticIconGlobalKeys;
-  final MarkerOption? markerOption;
   final RoadOption? roadConfiguration;
   final bool showDefaultInfoWindow;
   final bool isPicker;
-  final bool trackMyPosition;
   final ValueNotifier<Widget?> dynamicMarkerWidgetNotifier;
   final double stepZoom;
   final double initZoom;
@@ -23,18 +25,18 @@ class OsmWebWidget extends StatefulWidget {
   final double maxZoomLevel;
   final Function(bool)? onMapIsReady;
   final UserLocationMaker? userLocationMarker;
-
-  OsmWebWidget({
-    Key? key,
+  final bool isStatic;
+  const OsmWebWidget({
+    super.key,
     required this.controller,
+    this.userTrackingOption,
     this.onGeoPointClicked,
     this.onLocationChanged,
+    this.onMapMoved,
     required this.mapIsReadyListener,
     this.mapIsLoading,
     required this.globalKeys,
     this.staticIconGlobalKeys = const {},
-    this.trackMyPosition = false,
-    this.markerOption,
     this.roadConfiguration,
     this.showDefaultInfoWindow = false,
     this.isPicker = false,
@@ -46,13 +48,14 @@ class OsmWebWidget extends StatefulWidget {
     this.maxZoomLevel = 18,
     this.onMapIsReady,
     this.userLocationMarker,
-  }) : super(key: key);
+    this.isStatic = false,
+  });
 
   @override
   OsmWebWidgetState createState() => OsmWebWidgetState();
 }
 
-class OsmWebWidgetState extends State<OsmWebWidget> with AndroidLifecycleMixin {
+class OsmWebWidgetState extends State<OsmWebWidget> {
   late WebOsmController controller;
 
   GlobalKey? get defaultMarkerKey => widget.globalKeys[0];
@@ -70,7 +73,7 @@ class OsmWebWidgetState extends State<OsmWebWidget> with AndroidLifecycleMixin {
   GlobalKey get personIconMarkerKey => widget.globalKeys[6];
 
   GlobalKey get arrowDirectionMarkerKey => widget.globalKeys[7];
-  late Key keyWidget = GlobalKey();
+  final keyWidget = GlobalKey();
 
   @override
   void initState() {
@@ -91,7 +94,7 @@ class OsmWebWidgetState extends State<OsmWebWidget> with AndroidLifecycleMixin {
   Widget build(BuildContext context) {
     return HtmlElementView(
       key: keyWidget,
-      viewType: FlutterOsmPluginWeb.getViewType(),
+      viewType: FlutterOsmPluginWeb.getViewType(mapId),
       onPlatformViewCreated: onPlatformViewCreated,
     );
   }
@@ -99,24 +102,12 @@ class OsmWebWidgetState extends State<OsmWebWidget> with AndroidLifecycleMixin {
   Future<void> onPlatformViewCreated(int id) async {
     controller.init(this, id);
     controller.createHtml();
-    controller.addObserver(this);
+    //controller.addObserver(this);
     (OSMPlatform.instance as FlutterOsmPluginWeb).setWebMapController(
-      id,
+      mapId,
       controller,
     );
-    (widget.controller as BaseMapController).setBaseOSMController(controller);
+    widget.controller.setBaseOSMController(controller);
     widget.controller.init();
-  }
-
-  @override
-  void configChanged() {}
-
-  @override
-  void mapIsReady(bool isReady) {
-    if (widget.controller.osMMixin != null) {
-      Future.delayed(Duration(milliseconds: 10), () async {
-        await widget.controller.osMMixin!.mapIsReady(isReady);
-      });
-    }
   }
 }

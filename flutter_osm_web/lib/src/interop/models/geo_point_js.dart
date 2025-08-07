@@ -1,27 +1,41 @@
 @JS()
 library osm_interop;
 
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 @JS()
+@staticInterop
 @anonymous
-class GeoPointJs {
-  external num get lon;
+extension type GeoPointJs._(JSObject o) implements JSObject {
+  external num lon;
 
-  external num get lat;
+  external num lat;
 
   // Must have an unnamed factory constructor with named arguments.
   external factory GeoPointJs({num lon, num lat});
 }
 
 @JS()
+@staticInterop
 @anonymous
-class GeoPointWithOrientationJs {
-  external num get lon;
+extension type SizeJs._(JSObject o) implements JSObject {
+  external num width;
 
-  external num get lat;
+  external num height;
 
-  external num get angle;
+  // Must have an unnamed factory constructor with named arguments.
+  external factory SizeJs({num width, num height});
+}
+
+@JS()
+@staticInterop
+@anonymous
+extension type GeoPointWithOrientationJs._(JSObject o) implements JSObject {
+  external num lon;
+
+  external num lat;
+
+  external num angle;
 
   // Must have an unnamed factory constructor with named arguments.
   external factory GeoPointWithOrientationJs({
@@ -29,4 +43,30 @@ class GeoPointWithOrientationJs {
     num lat,
     num angle,
   });
+}
+
+@JS()
+@staticInterop
+@anonymous
+extension type IconAnchorJS._(JSObject o) implements JSObject {
+  external num x;
+
+  external num y;
+
+  external IconOffsetAnchorJS? get offset;
+
+  // Must have an unnamed factory constructor with named arguments.
+  external factory IconAnchorJS({num x, num y, IconOffsetAnchorJS? offset});
+}
+
+@JS()
+@staticInterop
+@anonymous
+extension type IconOffsetAnchorJS._(JSObject o) implements JSObject {
+  external num x;
+
+  external num y;
+
+  // Must have an unnamed factory constructor with named arguments.
+  external factory IconOffsetAnchorJS({num x, num y});
 }

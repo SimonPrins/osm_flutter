@@ -95,7 +95,7 @@ def get_max_version(version):
     return max_version
 
 
-def change_dependencies_version(package,name, version, isLocal=False):
+def change_dependencies_version(package,name, version, isLocal=False,skipMaxVersion=False,useDefault=False):
     mVersion = get_max_version(version=version)
     with open(package, "r+") as pub:
         pub.seek(0, 0)
@@ -103,7 +103,12 @@ def change_dependencies_version(package,name, version, isLocal=False):
         removeNext = False
         for line in pub.readlines():
             if(name in line):
-                v = f"\">={version} <{mVersion}\"".strip()
+                if skipMaxVersion :
+                    v = f"\">={version} <{mVersion}\"".strip()
+                elif useDefault == False :
+                    v = f"\">={version}\"".strip()
+                else :
+                    v = f"^{version}".strip()
                 lines.append(f"  {name} {v}")
                 if(isLocal):
                     removeNext = True
@@ -149,5 +154,5 @@ if __name__ == "__main__":
 
     version_interface = update_plugin_osm_interface()
     version_web = update_plugin_osm_web(version_interface)
-    change_dependencies_version(FILE_PUBSEPEC_OSM,"flutter_osm_interface:", version_interface, isLocal=True)
-    change_dependencies_version(FILE_PUBSEPEC_OSM,"flutter_osm_web:", version_web, isLocal=True)
+    change_dependencies_version(FILE_PUBSEPEC_OSM,"flutter_osm_interface:", version_interface, isLocal=True,useDefault=True)
+    change_dependencies_version(FILE_PUBSEPEC_OSM,"flutter_osm_web:", version_web, isLocal=True,skipMaxVersion=True)

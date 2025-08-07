@@ -10,7 +10,7 @@ class BoundingBox {
   final double south;
   final double west;
 
-  BoundingBox({
+  const BoundingBox({
     required this.north,
     required this.east,
     required this.south,
@@ -21,10 +21,10 @@ class BoundingBox {
         assert(west >= -180.0);
 
   const BoundingBox.world()
-      : this.north = 85.0,
-        this.east = 180.0,
-        this.south = -85.0,
-        this.west = -180.0;
+      : north = 85.0,
+        east = 180.0,
+        south = -85.0,
+        west = -180.0;
 
   static BoundingBox fromGeoPoints(List<GeoPoint> geoPoints) {
     if (geoPoints.isEmpty) {
@@ -58,11 +58,45 @@ class BoundingBox {
     );
   }
 
+  factory BoundingBox.fromCenter(GeoPoint center, double distanceKm) {
+    // Earth's radius in kilometers
+    const double R = 6371;
+
+    // Convert latitude and longitude to radians
+    double lat = center.latitude * pi / 180;
+    double lon = center.longitude * pi / 180;
+
+    // Angular distance in radians on a great circle
+    double angularDistance = distanceKm / R;
+
+    // Calculate min and max latitudes
+    double minLat = lat - angularDistance;
+    double maxLat = lat + angularDistance;
+
+    // Calculate min and max longitudes
+    double deltaLon = asin(sin(angularDistance) / cos(lat));
+    double minLon = lon - deltaLon;
+    double maxLon = lon + deltaLon;
+
+    // Convert back to degrees
+    minLat = minLat * 180 / pi;
+    maxLat = maxLat * 180 / pi;
+    minLon = minLon * 180 / pi;
+    maxLon = maxLon * 180 / pi;
+
+    return BoundingBox(
+      north: maxLat,
+      east: maxLon,
+      south: minLat,
+      west: minLon,
+    );
+  }
+
   BoundingBox.fromMap(Map map)
-      : this.north = map["north"],
-        this.east = map["east"],
-        this.south = map["south"],
-        this.west = map["west"];
+      : north = map["north"],
+        east = map["east"],
+        south = map["south"],
+        west = map["west"];
 
   @override
   String toString() {

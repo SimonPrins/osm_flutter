@@ -18,7 +18,7 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
 
   final Map<int, MethodChannel> _channels = {};
 
-  static String getViewType() => viewType; // "${viewType}_$mapId";
+  static String getViewType(int mapId) => "${viewType}_$mapId";
 
   Map<int, WebOsmController> mapsController = <int, WebOsmController>{};
 
@@ -35,7 +35,7 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
   static void registerWith(Registrar registrar) {
     final messenger = registrar;
     OSMPlatform.instance = FlutterOsmPluginWeb(messenger: messenger);
-    BindingWebOSM();
+    bindingWebOSM();
   }
 
   @override
@@ -65,7 +65,6 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
 
   @override
   Stream<RegionIsChangingEvent> onRegionIsChangingListener(int idMap) {
-    print("we listen on $idMap");
     return _events(idMap).whereType<RegionIsChangingEvent>();
   }
 
@@ -81,7 +80,7 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
     }
     if (!_channels.containsKey(idOSM)) {
       _channels[idOSM] = MethodChannel(
-        '${getViewType()}_$idOSM',
+        getViewType(idOSM),
         const StandardMethodCodec(),
         messenger,
       );
@@ -97,13 +96,16 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
     //_streamController.close();
     mapsController.remove(idOSM);
     _channels.remove(idOSM);
+    if (mapsController.isNotEmpty) {
+      map = mapsController.values.last;
+      mapId = mapsController.keys.last;
+    }
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
   /// Note: Check the "federated" architecture for a new way of doing this:
   /// https://flutter.dev/go/federated-plugins
   Future<dynamic> handleMethodCall(int idOSM) async {
-    print("handle $idOSM");
     _channels[idOSM]!.setMethodCallHandler((call) async {
       switch (call.method) {
         case "initMap":
@@ -132,6 +134,19 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
                 .add(RoadTapEvent(idOSM, map!.roadsWebCache[roadKey]!));
           }
           break;
+        case "receiveUserLocation":
+          final result = call.arguments;
+          final geoPt = GeoPoint.fromString(result);
+          _streamController.add(
+            UserLocationEvent(
+              idOSM,
+              UserLocation(
+                latitude: geoPt.latitude,
+                longitude: geoPt.latitude,
+              ),
+            ),
+          );
+          break;
         default:
           throw PlatformException(
             code: 'Unimplemented',
@@ -148,9 +163,7 @@ class FlutterOsmPluginWeb extends OsmWebPlatform {
   ) {
     if (!mapsController.containsKey(idChannel)) {
       map = controller;
-      map!.mapId = idChannel;
       mapsController.putIfAbsent(idChannel, () => map!);
-      //OsmWebPlatform.idOsmWeb++;
     }
   }
 }

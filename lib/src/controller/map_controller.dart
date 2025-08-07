@@ -13,64 +13,59 @@ import 'package:flutter_osm_plugin/src/controller/osm/osm_controller.dart';
 /// [initPosition] : (GeoPoint) if it isn't null, the map will be pointed at this position
 class MapController extends BaseMapController {
   MapController({
-    bool initMapWithUserPosition = true,
-    GeoPoint? initPosition,
-    BoundingBox? areaLimit = const BoundingBox.world(),
+    super.initMapWithUserPosition,
+    super.initPosition,
+    super.areaLimit = const BoundingBox.world(),
+    super.useExternalTracking,
   })  : assert(
-          initMapWithUserPosition ^ (initPosition != null),
+          (initMapWithUserPosition != null) ^ (initPosition != null),
         ),
         super(
-          initMapWithUserPosition: initMapWithUserPosition,
-          initPosition: initPosition,
-          areaLimit: areaLimit,
           customTile: null,
         );
 
   MapController.withPosition({
     required GeoPoint initPosition,
-    BoundingBox? areaLimit = const BoundingBox.world(),
+    super.areaLimit = const BoundingBox.world(),
   }) : super(
-          initMapWithUserPosition: false,
+          initMapWithUserPosition: null,
           initPosition: initPosition,
-          areaLimit: areaLimit,
           customTile: null,
         );
 
   MapController.withUserPosition({
-    BoundingBox? areaLimit = const BoundingBox.world(),
+    super.areaLimit = const BoundingBox.world(),
+    super.useExternalTracking = false,
+    UserTrackingOption trackUserLocation = const UserTrackingOption(
+      enableTracking: false,
+      unFollowUser: false,
+    ),
   }) : super(
-          initMapWithUserPosition: true,
+          initMapWithUserPosition: trackUserLocation,
           initPosition: null,
-          areaLimit: areaLimit,
           customTile: null,
         );
 
   MapController.customLayer({
-    bool initMapWithUserPosition = true,
-    GeoPoint? initPosition,
-    BoundingBox? areaLimit = const BoundingBox.world(),
+    super.initMapWithUserPosition,
+    super.initPosition,
+    super.areaLimit = const BoundingBox.world(),
     required CustomTile customTile,
   })  : assert(
-          initMapWithUserPosition || initPosition != null,
+          (initMapWithUserPosition != null) || initPosition != null,
         ),
         super(
-          initMapWithUserPosition: initMapWithUserPosition,
-          initPosition: initPosition,
-          areaLimit: areaLimit,
           customTile: customTile,
         );
 
   MapController.cyclOSMLayer({
-    bool initMapWithUserPosition = true,
-    GeoPoint? initPosition,
-    BoundingBox? areaLimit = const BoundingBox.world(),
+    super.initMapWithUserPosition,
+    super.initPosition,
+    super.areaLimit = const BoundingBox.world(),
   })  : assert(
-          initMapWithUserPosition || initPosition != null,
+          (initMapWithUserPosition != null) || initPosition != null,
         ),
         super(
-          initMapWithUserPosition: initMapWithUserPosition,
-          initPosition: initPosition,
-          areaLimit: areaLimit,
           customTile: CustomTile(
             urlsServers: [
               TileURLs(
@@ -88,16 +83,13 @@ class MapController extends BaseMapController {
           ),
         );
   MapController.publicTransportationLayer({
-    bool initMapWithUserPosition = true,
-    GeoPoint? initPosition,
-    BoundingBox? areaLimit = const BoundingBox.world(),
+    super.initMapWithUserPosition,
+    super.initPosition,
+    super.areaLimit = const BoundingBox.world(),
   })  : assert(
-          initMapWithUserPosition || initPosition != null,
+          (initMapWithUserPosition != null) || initPosition != null,
         ),
         super(
-          initMapWithUserPosition: initMapWithUserPosition,
-          initPosition: initPosition,
-          areaLimit: areaLimit,
           customTile: CustomTile(
             urlsServers: [
               TileURLs(url: "https://tile.memomaps.de/tilegen/"),
@@ -109,6 +101,9 @@ class MapController extends BaseMapController {
         );
 
   /// [dispose]
+  ///
+  /// this method used to dispose controller in the map
+  @override
   void dispose() {
     if (!kIsWeb) {
       (osmBaseController as MobileOSMController).dispose();
@@ -118,7 +113,8 @@ class MapController extends BaseMapController {
 
   /// [changeTileLayer]
   ///
-  ///
+  /// this method used to change tiles of map,
+  /// for now we support only raster tiles for now
   Future<void> changeTileLayer({
     CustomTile? tileLayer,
   }) async {
@@ -127,10 +123,11 @@ class MapController extends BaseMapController {
 
   /// [limitAreaMap]
   ///
-  /// set area camera limit of the map
-  /// [box] : (BoundingBox) bounding that map cannot exceed from it
-  Future<void> limitAreaMap(BoundingBox box) async {
-    await osmBaseController.limitArea(box);
+  /// this method is to set area camera limit of the map
+  ///
+  /// [boundingBox] : (BoundingBox) bounding that map cannot exceed from it
+  Future<void> limitAreaMap(BoundingBox boundingBox) async {
+    await osmBaseController.limitArea(boundingBox);
   }
 
   /// [removeLimitAreaMap]
@@ -140,39 +137,49 @@ class MapController extends BaseMapController {
     await osmBaseController.removeLimitArea();
   }
 
-  /// [changeLocation]
+  // [changeLocation]
   ///
   /// initialise or change of position with creating marker in that specific position
   ///
   /// [p] : geoPoint
-  Future<void> changeLocation(GeoPoint p) async {
-    await osmBaseController.changeLocation(p);
+  @Deprecated("we will remove this method in future release")
+  Future<void> changeLocation(GeoPoint position) async {
+    await osmBaseController.changeLocation(position);
   }
 
   /// [goToLocation]
   ///
-  ///animate  to specific position with out add marker into the map
+  /// animate to specific position with out add marker into the map
   ///
-  /// [p] : (GeoPoint) position that will be go to map
-  Future<void> goToLocation(GeoPoint p, {double? zoom = null, double? orientation = null}) async {
-    await osmBaseController.goToPosition(p, zoom: zoom, orientation: orientation);
+  /// [position] : (GeoPoint) position that will be go to map
+  Future<void> goToLocation(GeoPoint position, {double? zoom = null, double? orientation = null}) async {
+    await osmBaseController.goToPosition(position, zoom: zoom, orientation: orientation);
+  }
+
+  /// [moveTo]
+  ///
+  /// move the camera of the map to specific position with animation or without
+  /// using [animate] parameter (default: false)
+  ///
+  /// [position] : (GeoPoint) position that will be go to map
+  Future<void> moveTo(GeoPoint position, {bool animate = false}) async {
+    await osmBaseController.goToPosition(position, animate: animate);
   }
 
   /// [removeMarker]
   ///
-  ///remove marker from map of position
-  /// [p] : geoPoint
-  Future<void> removeMarker(GeoPoint p) async {
-    osmBaseController.removeMarker(p);
+  /// remove marker from map of position
+  ///
+  /// [position] : marker position that we want to remove from the map
+  Future<void> removeMarker(GeoPoint position) async {
+    osmBaseController.removeMarker(position);
   }
 
-  /// [changeIconMarker]
+  /// [removeMarkers]
   ///
-  /// this method allow to change Home Icon Marker
-  ///
-  /// [icon] : (MarkerIcon) widget that represent the new home marker
-  Future changeIconMarker(MarkerIcon icon) async {
-    await osmBaseController.changeDefaultIconMarker(icon);
+  ///remove markers from map of position
+  Future<void> removeMarkers(List<GeoPoint> geoPoints) async {
+    osmBaseController.removeMarkers(geoPoints);
   }
 
   /// setMarkerIcon
@@ -194,6 +201,8 @@ class MapController extends BaseMapController {
     await osmBaseController.changeIconAdvPickerMarker(key);
   }*/
 
+  /// [setStaticPosition]
+  ///
   /// change static position in runtime
   ///  [geoPoints] : list of static geoPoint
   ///  [id] : String of that list of static geoPoint
@@ -201,7 +210,9 @@ class MapController extends BaseMapController {
     await osmBaseController.setStaticPosition(geoPoints, id);
   }
 
-  ///change  Marker of specific static points
+  /// [setMarkerOfStaticPoint]
+  ///
+  /// change  Marker of specific static points
   /// we need to global key to recuperate widget from tree element
   /// [id] : (String) id  of the static group geopoint
   ///
@@ -209,11 +220,15 @@ class MapController extends BaseMapController {
   Future<void> setMarkerOfStaticPoint({
     required String id,
     required MarkerIcon markerIcon,
-  }) async {
-    await osmBaseController.setIconStaticPositions(id, markerIcon,
-        refresh: true);
-  }
+  }) =>
+      osmBaseController.setIconStaticPositions(
+        id,
+        markerIcon,
+        refresh: true,
+      );
 
+  /// [getZoom]
+  ///
   /// recuperate current zoom level
   Future<double> getZoom() async => await osmBaseController.getZoom();
 
@@ -285,32 +300,55 @@ class MapController extends BaseMapController {
 
   /// [enableTracking]
   ///
-  /// this method will enabled tracking user location,[enableStopFollow] is true ,
-  /// the map will follow the user location when it change
-  Future<void> enableTracking({bool enableStopFollow = false}) async {
-    await osmBaseController.enableTracking(enableStopFollow: enableStopFollow);
+  /// this method will enable tracking the user location,
+  /// [enableStopFollow] is false ,the map will return follow the user location when it change
+  ///
+  /// [enableStopFollow] is true ,the map will not follow the user location when it change if user change the location of the map
+  ///
+  /// To disable the rotation of user marker,
+  /// change [disableUserMarkerRotation] to true (default : false)
+  ///
+  ///
+  Future<void> enableTracking({
+    bool enableStopFollow = false,
+    bool disableUserMarkerRotation = false,
+    Anchor anchor = Anchor.center,
+    bool useDirectionMarker = false,
+  }) async {
+    await osmBaseController.enableTracking(
+        enableStopFollow: enableStopFollow,
+        disableMarkerRotation: disableUserMarkerRotation,
+        anchor: anchor,
+        useDirectionMarker: useDirectionMarker);
+  }
+
+  /// [startLocationUpdating]
+  ///
+  /// Starts receiving the user’s current location.
+  ///
+  /// use this method to start only receiving the user location without
+  /// controlling the map which you can do that manually
+  Future<void> startLocationUpdating({
+    bool enableStopFollow = false,
+    bool disableUserMarkerRotation = false,
+    Anchor anchor = Anchor.center,
+    bool useDirectionMarker = false,
+  }) async {
+    await osmBaseController.startLocationUpdating();
+  }
+
+  ///[stopLocationUpdating]
+  ///
+  /// Stops receive of location updates.
+  ///
+  /// use this method to stop receiving the user location events
+  Future<void> stopLocationUpdating() async {
+    await osmBaseController.stopLocationUpdating();
   }
 
   /// disabled tracking user location
   Future<void> disabledTracking() async {
     await osmBaseController.disabledTracking();
-  }
-
-  @Deprecated(
-    "this method will be removed in 0.25.0,use callback `listenerMapSingleTapping` or `listenerMapLongTapping` "
-    "to listener to click on the map, and use `addMarker` to create marker in that specific location",
-  )
-
-  /// pick Position in map
-  Future<GeoPoint> selectPosition({
-    MarkerIcon? icon,
-    String imageURL = "",
-  }) async {
-    GeoPoint p = await osmBaseController.selectPosition(
-      icon: icon,
-      imageURL: imageURL,
-    );
-    return p;
   }
 
   ///  draw road
@@ -425,25 +463,8 @@ class MapController extends BaseMapController {
     await osmBaseController.removeAllShapes();
   }
 
-  Future<void> advancedPositionPicker() async {
-    await osmBaseController.advancedPositionPicker();
-  }
-
-  /// select current position and finish advanced picker
-  Future<GeoPoint> selectAdvancedPositionPicker() async {
-    return await osmBaseController.selectAdvancedPositionPicker();
-  }
-
-  /// get current position
-  Future<GeoPoint> getCurrentPositionAdvancedPositionPicker() async {
-    return await osmBaseController.getCurrentPositionAdvancedPositionPicker();
-  }
-
-  /// cancel advanced picker
-  Future<void> cancelAdvancedPositionPicker() async {
-    return await osmBaseController.cancelAdvancedPositionPicker();
-  }
-
+  /// [rotateMapCamera]
+  ///
   /// rotate camera of osm map
   Future<void> rotateMapCamera(double degree) async {
     return await osmBaseController.mapOrientation(degree);
@@ -506,14 +527,17 @@ class MapController extends BaseMapController {
     GeoPoint p, {
     MarkerIcon? markerIcon,
     double? angle,
+    IconAnchor? iconAnchor,
   }) async {
     if (angle != null) {
-      assert(angle >= -pi && angle <= pi, "angle should be between -pi and pi");
+      assert(
+          angle >= 0 && angle <= 2 * pi, "angle should be between 0 and 2*pi");
     }
     await osmBaseController.addMarker(
       p,
       markerIcon: markerIcon,
       angle: angle,
+      iconAnchor: iconAnchor,
     );
   }
 
@@ -521,16 +545,23 @@ class MapController extends BaseMapController {
     required GeoPoint oldLocation,
     required GeoPoint newLocation,
     MarkerIcon? markerIcon,
+    double? angle,
+    IconAnchor? iconAnchor,
   }) async {
     await osmBaseController.changeMarker(
       oldLocation: oldLocation,
       newLocation: newLocation,
       newMarkerIcon: markerIcon,
+      angle: angle,
+      iconAnchor: iconAnchor,
     );
   }
 
   Future<BoundingBox> get bounds async => await osmBaseController.getBounds();
 
+  /// centerMap
+  ///
+  /// this attribute to retrieve center location of the map
   Future<GeoPoint> get centerMap async =>
       await osmBaseController.getMapCenter();
 
