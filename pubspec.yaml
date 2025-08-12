@@ -18,15 +18,16 @@ dependencies:
   url_launcher: ^6.3.0
   dio: ^5.3.3
   uuid: ^4.2.1
-  flutter_plugin_android_lifecycle: ^2.0.17
-  permission_handler: ^11.3.1
-  url_launcher: ^6.3.0
-  dio: ^5.3.3
-  uuid: ^4.2.1
   flutter_osm_interface:
-    path: ./flutter_osm_interface/
+    git:
+      url: https://github.com/SimonPrins/osm_flutter.git
+      ref: update-gradle-2
+      path: flutter_osm_interface
   flutter_osm_web:
-    path: ./flutter_osm_web/
+    git:
+      url: https://github.com/SimonPrins/osm_flutter.git
+      ref: update-gradle-2
+      path: flutter_osm_web
 dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:
