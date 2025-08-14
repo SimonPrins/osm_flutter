@@ -90,6 +90,6 @@ dependencies {
 
     //coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
 
-    //implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'
+    //implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'bd58e987a68a1a0f4bb50eef1e7d914d0cc
 
 }

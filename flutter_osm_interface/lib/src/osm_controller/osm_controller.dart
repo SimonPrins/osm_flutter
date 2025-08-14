@@ -140,15 +140,15 @@ abstract class IBaseOSMController {
   Future<void> goToPosition(GeoPoint p, {bool animate = false, double? zoom = null, double? orientation = null});
 
   /// [enableTracking]
-  /// 
-  /// to start tracking user location where we will show [personMarker] 
+  ///
+  /// to start tracking user location where we will show [personMarker]
   /// or [directionMarker] depend on heading value but we can configure the marker to be always
   /// [directionMarker] by set [useDirectionMarker] to true (default:false)
-  /// 
+  ///
   /// we can also enable stop following user when the user move the map by set [enableStopFollow] to true
   /// with [disableMarkerRotation] we can disable rotation of the marker
   /// and [anchor] will change the position of the marker compared to center of the marker
-  /// 
+  ///
   Future<void> enableTracking({
     bool enableStopFollow = false,
     bool disableMarkerRotation,
@@ -162,6 +162,7 @@ abstract class IBaseOSMController {
   /// [startLocationUpdating]
   ///
   Future<void> startLocationUpdating();
+
   /// [stopLocationUpdating]
   ///
   Future<void> stopLocationUpdating();
@@ -198,7 +199,7 @@ abstract class IBaseOSMController {
   ///
   ///  [roadOption] : (RoadOption) contain style of road such as color,width,borderColor,zoomInto
   Future<String> drawRoadManually(
-    String Key,
+    String key,
     List<GeoPoint> path,
     RoadOption roadOption,
   );
