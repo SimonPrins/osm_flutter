@@ -289,7 +289,7 @@ class FlutterOsmView(
         mapView?.minZoomLevel = 2.0
 
         mapView?.setExpectedCenter(GeoPoint(52.175, 5.325))
-        mapView?.controller.setZoom(8.0)
+        mapView?.controller?.setZoom(8.0)
 
         mapView?.addMapListener(mapListener)
         if (isStaticMap) {
