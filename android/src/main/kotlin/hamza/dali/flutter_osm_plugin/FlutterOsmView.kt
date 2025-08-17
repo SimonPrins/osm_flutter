@@ -1029,10 +1029,7 @@ class FlutterOsmView(
         val orientation = if (args.containsKey("orientation")) (360 - (args["orientation"] as Double).toFloat()) else null
         val animate = args["animate"] as Boolean? ?: false
         //mapView?.controller.zoomTo(defaultZoom)
-        when (animate) {
-            true -> mapView?.controller?.animateTo(geoPoint, zoomLevel, 1000, orientation)
-            false -> mapView?.controller?.setCenter(geoPoint)
-        }
+        mapView?.controller?.animateTo(geoPoint, zoomLevel, 1000, orientation)
 
         result.success(null)
     }
