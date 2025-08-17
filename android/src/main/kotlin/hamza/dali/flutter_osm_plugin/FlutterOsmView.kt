@@ -1025,10 +1025,12 @@ class FlutterOsmView(
     private fun moveToSpecificPosition(call: MethodCall, result: MethodChannel.Result) {
         val args = call.arguments!! as HashMap<String, *>
         val geoPoint = GeoPoint(args["lat"]!! as Double, args["lon"]!! as Double)
+        val zoomLevel  = if (args.containsKey("zoomLevel")) args["zoomLevel"] as Double else null
+        val orientation = if (args.containsKey("orientation")) (360 - (args["orientation"] as Double).toFloat()) else null
         val animate = args["animate"] as Boolean? ?: false
         //mapView?.controller.zoomTo(defaultZoom)
         when (animate) {
-            true -> mapView?.controller?.animateTo(geoPoint)
+            true -> mapView?.controller?.animateTo(geoPoint, zoomLevel, 1000, orientation)
             false -> mapView?.controller?.setCenter(geoPoint)
         }
 
