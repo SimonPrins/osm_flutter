@@ -154,7 +154,7 @@ class MapController extends BaseMapController {
   ///
   /// [position] : (GeoPoint) position that will be go to map
   Future<void> goToLocation(GeoPoint position, {double? zoom = null, double? orientation = null}) async {
-    await osmBaseController.goToPosition(position, zoom: zoom, orientation: orientation);
+    await osmBaseController.goToPosition(position, zoom: zoom, orientation: orientation, animate: true);
   }
 
   /// [moveTo]
