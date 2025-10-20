@@ -374,13 +374,13 @@ class MapCoreOSMView : NSObject, FlutterPlatformView, CLLocationManagerDelegate,
              currentZoom = zoomConfig.initZoom
          }
         if (args.keys.contains("zoomLevel")) {
-            currentZoom = args["zoomLevel"] as! Double
+            currentZoom = args["zoomLevel"] as! Int
         }
-		var bearing = mapView.bearing
         if (args.keys.contains("orientation")) {
-            bearing = CGFloat(args["orientation"] as! Double)
+            let bearing = CGFloat(args["orientation"] as! Double)
+            self.mapOSM.setRotation(angle: bearing)
         }
-        self.mapOSM.moveTo(location: point, zoom: currentZoom, bearing: bearing, animated: animate)
+        self.mapOSM.moveTo(location: point, zoom: currentZoom, animated: animate)
         result(200)
     }
     func rotateMap(call:FlutterMethodCall){
