@@ -811,8 +811,10 @@ class FlutterOsmView(
             }.value
         }.let { byteArray ->
             scope?.launch {
+                if (markerIconsCache.containsKey(oldLocation)) {
+                    markerIconsCache.remove(oldLocation)
+                }
                 markerIconsCache[newLocation] = byteArray
-                markerIconsCache.remove(oldLocation)
             }
             val bitmap = byteArray?.toBitmap()
             bitmap
