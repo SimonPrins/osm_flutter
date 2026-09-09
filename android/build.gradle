@@ -28,7 +28,7 @@ apply plugin: 'kotlin-android'
 //apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace "hamza.dali.flutter_osm_plugin"
 
     sourceSets {
